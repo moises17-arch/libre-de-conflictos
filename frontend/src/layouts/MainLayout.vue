@@ -1,59 +1,99 @@
 <template>
   <div class="layout-container">
-    <!-- Barra de navegación superior -->
     <header class="navbar">
-      <h1>Libre de Conflictos</h1>
-      <nav>
-        <router-link to="/">Inicio</router-link> |
-        <router-link to="/eventos">Eventos y Conflictos</router-link>
+      <RouterLink to="/" class="logo">
+        <span>📅</span>
+        <span>Libre de Conflictos</span>
+      </RouterLink>
+      <nav class="nav-links">
+        <RouterLink to="/">Inicio</RouterLink>
+        <RouterLink to="/eventos">Eventos</RouterLink>
       </nav>
     </header>
 
-    <!-- Contenido dinámico que cambia según la ruta -->
     <main class="main-content">
       <router-view />
     </main>
 
-    <!-- Pie de página -->
-    <footer>
-      <p>&copy; 2026 - Gestión de Horarios</p>
+    <footer class="footer">
+      © 2026 Libre de Conflictos — Gestión inteligente de agendas
     </footer>
   </div>
 </template>
 
 <style scoped>
 .layout-container {
-  font-family: Arial, sans-serif;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
+
 .navbar {
-  background-color: #2c3e50;
-  color: white;
-  padding: 1rem;
+  background: linear-gradient(135deg, #374151 0%, #4b5563 50%, #6b7280 100%);
+  padding: 0 2rem;
+  height: 64px;
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
 }
-.navbar nav a {
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   color: white;
   text-decoration: none;
-  margin-left: 15px;
-  font-weight: bold;
+  font-size: 1.25rem;
+  font-weight: 700;
 }
-.navbar nav a.router-link-exact-active {
-  color: #42b983;
+
+.nav-links {
+  display: flex;
+  gap: 0.25rem;
 }
+
+.nav-links a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  position: relative;
+  transition: color 0.2s, background 0.2s;
+}
+
+.nav-links a:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-links a.router-link-active {
+  color: white;
+  font-weight: 600;
+}
+
+.nav-links a.router-link-active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0.5rem;
+  right: 0.5rem;
+  height: 2px;
+  background: #d1d5db;
+  border-radius: 2px;
+}
+
 .main-content {
   flex: 1;
-  padding: 2rem;
-  background-color: #f9f9f9;
+  background: #f3f4f6;
+  padding: 2rem 1rem;
 }
-footer {
+
+.footer {
+  background: #374151;
+  color: rgba(255, 255, 255, 0.6);
   text-align: center;
   padding: 1rem;
-  background-color: #333;
-  color: white;
+  font-size: 0.875rem;
 }
 </style>
