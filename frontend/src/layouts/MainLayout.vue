@@ -29,7 +29,7 @@
 }
 
 .navbar {
-  background: linear-gradient(135deg, #374151 0%, #4b5563 50%, #6b7280 100%);
+  background: linear-gradient(135deg, #2b2b2d 0%, #2e2e2e 50%, #303031 100%);
   padding: 0 2rem;
   height: 64px;
   display: flex;
@@ -90,8 +90,8 @@
 }
 
 .footer {
-  background: #374151;
-  color: rgba(255, 255, 255, 0.6);
+  background: #1e1f20;
+  color: rgba(243, 239, 239, 0.6);
   text-align: center;
   padding: 1rem;
   font-size: 0.875rem;
