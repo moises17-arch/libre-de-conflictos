@@ -47,7 +47,7 @@
 <style scoped>
 /* Hero */
 .hero {
-  background: linear-gradient(135deg, #1a1a2e 0%, #4a1a8a 100%);
+  background: linear-gradient(135deg, #111111 0%, #2b2a2c 100%);
   color: white;
   text-align: center;
   padding: 5rem 2rem;
@@ -57,12 +57,12 @@
 }
 
 .badge {
-  background: rgba(170, 59, 255, 0.2);
-  border: 1px solid rgba(170, 59, 255, 0.5);
+  background: rgba(53, 53, 54, 0.2);
+  border: 1px solid rgba(22, 20, 23, 0.5);
   border-radius: 20px;
   padding: 0.4rem 1rem;
   font-size: 0.875rem;
-  color: #c084fc;
+  color: #e4e0e9;
   margin-bottom: 1.5rem;
 }
 
@@ -81,20 +81,20 @@
 }
 
 .cta-button {
-  background: linear-gradient(135deg, #aa3bff, #7c2dbf);
+  background: linear-gradient(135deg, #2c2b2e, #302f30);
   color: white;
   padding: 0.875rem 2.5rem;
   border-radius: 50px;
   text-decoration: none;
   font-size: 1rem;
   font-weight: 600;
-  box-shadow: 0 4px 20px rgba(170, 59, 255, 0.4);
+  box-shadow: 0 4px 20px rgba(80, 77, 82, 0.4);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .cta-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(170, 59, 255, 0.6);
+  box-shadow: 0 8px 30px rgba(41, 39, 42, 0.6);
 }
 
 /* Features */
@@ -105,7 +105,7 @@
 
 .features-title {
   text-align: center;
-  color: #1a1a2e;
+  color: #29292a;
   font-size: 2rem;
   margin-bottom: 3rem;
 }
@@ -123,7 +123,7 @@
   border-radius: 16px;
   padding: 2rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(170, 59, 255, 0.1);
+  border: 1px solid rgba(29, 27, 31, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -141,12 +141,12 @@
 .feature-card-title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #444448;
   margin-bottom: 0.75rem;
 }
 
 .feature-card-desc {
-  color: #6b6375;
+  color: #363637;
   line-height: 1.6;
 }
 

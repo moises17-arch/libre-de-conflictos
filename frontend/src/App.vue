@@ -1,6 +1,7 @@
-<script setup lang="ts">
-import MainLayout from './layouts/MainLayout.vue';
-</script>
 <template>
-  <MainLayout />
+  <router-view />
 </template>
+
+<script setup lang="ts">
+// No necesitas importar MainLayout aquí, el router se encarga de cargarlo automáticamente.
+</script>

@@ -155,12 +155,12 @@ async function handleSubmit() {
 .page-title {
   font-size: 1.75rem;
   font-weight: 800;
-  color: #1a1a2e;
+  color: #3d3d43;
   margin-bottom: 0.5rem;
 }
 
 .page-subtitle {
-  color: #6b6375;
+  color: #58545d;
   font-size: 1rem;
 }
 
@@ -185,13 +185,13 @@ async function handleSubmit() {
   border-radius: 16px;
   padding: 2rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(170, 59, 255, 0.1);
+  border: 1px solid rgba(54, 53, 55, 0.1);
 }
 
 .card-title {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #252526;
   margin-bottom: 1.5rem;
 }
 
@@ -203,7 +203,7 @@ async function handleSubmit() {
 }
 
 .form-group label {
-  color: #1a1a2e;
+  color: #303031;
   font-weight: 600;
   font-size: 0.875rem;
   margin-bottom: 0.5rem;
@@ -224,14 +224,14 @@ async function handleSubmit() {
 
 .form-group input:focus,
 .form-group textarea:focus {
-  border-color: #aa3bff;
-  box-shadow: 0 0 0 3px rgba(170, 59, 255, 0.15);
+  border-color: #353436;
+  box-shadow: 0 0 0 3px rgba(50, 49, 50, 0.15);
 }
 
 .submit-btn {
   width: 100%;
   padding: 0.875rem;
-  background: linear-gradient(135deg, #aa3bff, #7c2dbf);
+  background: linear-gradient(135deg, #353336, #474648);
   color: white;
   border: none;
   border-radius: 10px;
@@ -239,7 +239,7 @@ async function handleSubmit() {
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.2s;
-  box-shadow: 0 4px 15px rgba(170, 59, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(54, 52, 55, 0.3);
 }
 
 .submit-btn:hover {
