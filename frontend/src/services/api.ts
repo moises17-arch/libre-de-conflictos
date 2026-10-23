@@ -16,3 +16,26 @@ api.interceptors.request.use((config) => {
   }
   return config;
 }, (error) => Promise.reject(error));
+
+// Interceptor de respuesta: refresca el token en caso de 401
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        const res = await api.post<{ accessToken: string }>('/auth/refresh');
+        const newToken = res.data.accessToken;
+        localStorage.setItem('accessToken', newToken);
+        originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+        return api(originalRequest);
+      } catch {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
