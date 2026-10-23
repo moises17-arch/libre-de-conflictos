@@ -3,7 +3,8 @@ const EventService = require('../services/event.service');
 class EventController {
   static async create(req, res) {
     try {
-      const { userId, title, description, startTime, endTime, timezone } = req.body;
+      const userId = req.user.id;
+      const { title, description, startTime, endTime, timezone } = req.body;
       const newEvent = await EventService.createEvent(userId, {
         title,
         description,

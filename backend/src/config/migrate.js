@@ -20,6 +20,24 @@ const schema = [
       { name: 'created_at', def: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP' },
     ],
   },
+  {
+    table: 'refresh_tokens',
+    create: `
+      CREATE TABLE IF NOT EXISTS refresh_tokens (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        token VARCHAR(512) UNIQUE NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `,
+    columns: [
+      { name: 'user_id',    def: 'INTEGER REFERENCES users(id) ON DELETE CASCADE' },
+      { name: 'token',      def: 'VARCHAR(512) UNIQUE NOT NULL' },
+      { name: 'expires_at', def: 'TIMESTAMP NOT NULL' },
+      { name: 'created_at', def: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP' },
+    ],
+  },
 ];
 
 async function runMigrations() {
