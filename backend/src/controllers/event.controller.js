@@ -25,6 +25,9 @@ class EventController {
   static async getByUser(req, res) {
     try {
       const { userId } = req.params;
+      if (parseInt(userId, 10) !== req.user.id) {
+        return res.status(403).json({ error: 'No autorizado para ver eventos de otro usuario' });
+      }
       const events = await EventService.getEventsByUser(userId);
       return res.json(events);
     } catch (error) {

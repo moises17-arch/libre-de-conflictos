@@ -78,7 +78,7 @@ router.put('/profile', verifyToken, UserController.updateProfile);
  *                   items:
  *                     $ref: '#/components/schemas/User'
  */
-router.get('/', UserController.getAll);
+router.get('/', verifyToken, UserController.getAll);
 
 /**
  * @swagger
@@ -107,7 +107,7 @@ router.get('/', UserController.getAll);
  *       404:
  *         description: Usuario no encontrado
  */
-router.get('/:id', UserController.getById);
+router.get('/:id', verifyToken, UserController.getById);
 
 /**
  * @swagger
@@ -138,7 +138,7 @@ router.get('/:id', UserController.getById);
  *       409:
  *         description: Email ya registrado
  */
-router.post('/', UserController.create);
+router.post('/', verifyToken, UserController.create);
 
 /**
  * @swagger
@@ -164,7 +164,7 @@ router.post('/', UserController.create);
  *       404:
  *         description: Usuario no encontrado
  */
-router.put('/:id', UserController.update);
+router.put('/:id', verifyToken, UserController.update);
 
 /**
  * @swagger
@@ -184,6 +184,6 @@ router.put('/:id', UserController.update);
  *       404:
  *         description: Usuario no encontrado
  */
-router.delete('/:id', UserController.remove);
+router.delete('/:id', verifyToken, UserController.remove);
 
 module.exports = router;
