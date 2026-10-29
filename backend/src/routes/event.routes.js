@@ -6,5 +6,7 @@ const router = Router();
 
 router.post('/', verifyToken, EventController.create);
 router.get('/user/:userId', verifyToken, EventController.getByUser);
+router.put('/:id', verifyToken, EventController.update);
+router.delete('/:id', verifyToken, EventController.remove);
 
 module.exports = router;

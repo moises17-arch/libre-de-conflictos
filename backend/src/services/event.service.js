@@ -54,6 +54,62 @@ class EventService {
     );
     return rows;
   }
+
+  static async updateEvent(eventId, userId, eventData) {
+    const { title, description, startTime, endTime, timezone } = eventData;
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      // Verify ownership with lock
+      const ownerCheck = await client.query(
+        'SELECT id FROM events WHERE id = $1 AND user_id = $2 FOR UPDATE',
+        [eventId, userId]
+      );
+      if (ownerCheck.rows.length === 0) {
+        throw new Error('Evento no encontrado o no autorizado');
+      }
+
+      // Check overlaps excluding the event being updated
+      const overlapCheck = await client.query(
+        `SELECT id FROM events
+         WHERE user_id = $1 AND id != $2
+           AND start_time < $4 AND end_time > $3
+         FOR UPDATE`,
+        [userId, eventId, startTime, endTime]
+      );
+      if (overlapCheck.rows.length > 0) {
+        throw new Error('Conflicto de horario: El intervalo se solapa con otro evento existente.');
+      }
+
+      const { rows } = await client.query(
+        `UPDATE events
+         SET title = $1, description = $2, start_time = $3, end_time = $4, timezone = $5
+         WHERE id = $6 AND user_id = $7
+         RETURNING *`,
+        [title, description, startTime, endTime, timezone, eventId, userId]
+      );
+
+      await client.query('COMMIT');
+      return rows[0];
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
+  static async deleteEvent(eventId, userId) {
+    const { rows } = await pool.query(
+      'DELETE FROM events WHERE id = $1 AND user_id = $2 RETURNING id',
+      [eventId, userId]
+    );
+    if (rows.length === 0) {
+      throw new Error('Evento no encontrado o no autorizado');
+    }
+    return { deleted: true };
+  }
 }
 
 module.exports = EventService;

@@ -20,6 +20,18 @@ const routes = [
         name: 'Eventos',
         component: EventosView,
         meta: { requiresAuth: true }
+      },
+      {
+        path: 'calendario',
+        name: 'Calendario',
+        component: () => import('../views/CalendarioView.vue'),
+        meta: { requiresAuth: true }
+      },
+      {
+        path: 'perfil',
+        name: 'Perfil',
+        component: () => import('../views/PerfilView.vue'),
+        meta: { requiresAuth: true }
       }
     ]
   },

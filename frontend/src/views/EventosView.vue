@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useEventStore } from '../store/eventStore';
+import { useAuthStore } from '../store/authStore';
+import type { EventModel } from '../types/event';
 
 const eventStore = useEventStore();
-const userId = ref<number>(1);
+const authStore = useAuthStore();
+
+// Create form state
 const title = ref<string>('');
 const description = ref<string>('');
 const startTime = ref<string>('');
@@ -12,14 +16,23 @@ const timezone = ref<string>('America/Bogota');
 const feedbackMessage = ref<string>('');
 const isError = ref<boolean>(false);
 
+// Edit modal state
+const editingEvent = ref<EventModel | null>(null);
+const editTitle = ref('');
+const editDescription = ref('');
+const editStartTime = ref('');
+const editEndTime = ref('');
+const editTimezone = ref('');
+const editFeedback = ref('');
+const editIsError = ref(false);
+
 onMounted(() => {
-  eventStore.fetchEvents(userId.value);
+  eventStore.fetchEvents(authStore.user!.id);
 });
 
 async function handleSubmit() {
   feedbackMessage.value = '';
   const result = await eventStore.createEvent({
-    userId: userId.value,
     title: title.value,
     description: description.value,
     startTime: startTime.value,
@@ -34,6 +47,53 @@ async function handleSubmit() {
     startTime.value = '';
     endTime.value = '';
   }
+}
+
+function toDatetimeLocal(iso: string | undefined): string {
+  if (!iso) return '';
+  try {
+    return new Date(iso).toISOString().slice(0, 16);
+  } catch {
+    return '';
+  }
+}
+
+function openEdit(ev: EventModel) {
+  editingEvent.value = { ...ev };
+  editTitle.value = ev.title;
+  editDescription.value = ev.description || '';
+  editStartTime.value = toDatetimeLocal(ev.startTime || (ev as any).start_time);
+  editEndTime.value = toDatetimeLocal(ev.endTime || (ev as any).end_time);
+  editTimezone.value = ev.timezone;
+  editFeedback.value = '';
+  editIsError.value = false;
+}
+
+function closeEdit() {
+  editingEvent.value = null;
+}
+
+async function handleUpdate() {
+  editFeedback.value = '';
+  const result = await eventStore.updateEvent(editingEvent.value!.id!, {
+    title: editTitle.value,
+    description: editDescription.value,
+    startTime: editStartTime.value,
+    endTime: editEndTime.value,
+    timezone: editTimezone.value,
+  });
+  editIsError.value = !result.success;
+  editFeedback.value = result.message;
+  if (result.success) {
+    closeEdit();
+  }
+}
+
+async function handleDelete(id: number) {
+  if (!confirm('¿Seguro que quieres eliminar este evento?')) return;
+  const result = await eventStore.deleteEvent(id);
+  isError.value = !result.success;
+  feedbackMessage.value = result.message;
 }
 </script>
 
@@ -135,8 +195,62 @@ async function handleSubmit() {
               {{ new Date(ev.endTime || (ev as any).end_time).toLocaleString() }}
             </p>
             <p v-if="ev.description" class="event-desc">{{ ev.description }}</p>
+            <div class="event-actions">
+              <button class="btn-edit" @click="openEdit(ev)">✏️ Editar</button>
+              <button class="btn-delete" @click="handleDelete(ev.id!)">🗑️ Eliminar</button>
+            </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Edit modal overlay -->
+    <div
+      v-if="editingEvent"
+      class="edit-modal-overlay"
+      @click.self="closeEdit"
+    >
+      <div class="edit-modal">
+        <div class="modal-header">
+          <h3 class="modal-title">✏️ Editar Evento</h3>
+          <button class="close-btn" @click="closeEdit">✕</button>
+        </div>
+
+        <form @submit.prevent="handleUpdate">
+          <div class="form-group">
+            <label>Título</label>
+            <input v-model="editTitle" type="text" required placeholder="Nombre del evento" />
+          </div>
+
+          <div class="form-group">
+            <label>Descripción</label>
+            <textarea v-model="editDescription" rows="3" placeholder="Descripción opcional"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Inicio</label>
+            <input v-model="editStartTime" type="datetime-local" required />
+          </div>
+
+          <div class="form-group">
+            <label>Fin</label>
+            <input v-model="editEndTime" type="datetime-local" required />
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="cancel-btn" @click="closeEdit">Cancelar</button>
+            <button type="submit" class="update-btn">Actualizar</button>
+          </div>
+
+          <div
+            v-if="editFeedback"
+            class="feedback-message"
+            :class="editIsError ? 'feedback-error' : 'feedback-success'"
+          >
+            <span>{{ editIsError ? '❌' : '✅' }}</span>
+            <span>{{ editFeedback }}</span>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -297,7 +411,7 @@ async function handleSubmit() {
 }
 
 .event-item:hover {
-  background: #f8f7ff;
+  background: #f5f5f5;
 }
 
 .event-title {
@@ -319,5 +433,134 @@ async function handleSubmit() {
   font-size: 0.875rem;
   color: #6b6375;
   margin-top: 0.375rem;
+}
+
+/* Edit/Delete actions */
+.event-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.btn-edit,
+.btn-delete {
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-edit {
+  background: #f0f0f2;
+  color: #3d3d43;
+}
+
+.btn-edit:hover {
+  background: #e0e0e4;
+  transform: translateY(-1px);
+}
+
+.btn-delete {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.btn-delete:hover {
+  background: #fee2e2;
+  transform: translateY(-1px);
+}
+
+/* Edit modal */
+.edit-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.edit-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modal-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #252526;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.125rem;
+  cursor: pointer;
+  color: #6b6375;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.close-btn:hover {
+  background: #f0f0f2;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.cancel-btn {
+  flex: 1;
+  padding: 0.75rem;
+  background: #f0f0f2;
+  color: #3d3d43;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cancel-btn:hover {
+  background: #e0e0e4;
+}
+
+.update-btn {
+  flex: 1;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #353336, #474648);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+  box-shadow: 0 4px 15px rgba(54, 52, 55, 0.3);
+}
+
+.update-btn:hover {
+  transform: translateY(-1px);
 }
 </style>

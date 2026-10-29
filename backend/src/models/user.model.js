@@ -42,6 +42,18 @@ const UserModel = {
     return rows[0] || null;
   },
 
+  async updateWithPassword(id, { name, email, password }) {
+    if (password) {
+      const hashed = await bcrypt.hash(password, 10);
+      const { rows } = await pool.query(
+        'UPDATE users SET name = $1, email = $2, password = $3 WHERE id = $4 RETURNING id, name, email, created_at',
+        [name, email, hashed, id]
+      );
+      return rows[0] || null;
+    }
+    return this.update(id, { name, email });
+  },
+
   async delete(id) {
     const { rows } = await pool.query(
       'DELETE FROM users WHERE id = $1 RETURNING id',

@@ -1,3 +1,16 @@
+<script setup lang="ts">
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '../store/authStore';
+
+const router = useRouter();
+const authStore = useAuthStore();
+
+async function handleLogout() {
+  await authStore.logout();
+  router.push('/login');
+}
+</script>
+
 <template>
   <div class="layout-container">
     <header class="navbar">
@@ -8,6 +21,15 @@
       <nav class="nav-links">
         <RouterLink to="/">Inicio</RouterLink>
         <RouterLink to="/eventos">Eventos</RouterLink>
+        <RouterLink to="/calendario">Calendario</RouterLink>
+        <RouterLink to="/perfil">Perfil</RouterLink>
+        <button
+          v-if="authStore.isAuthenticated"
+          class="logout-btn"
+          @click="handleLogout"
+        >
+          Cerrar Sesión
+        </button>
       </nav>
     </header>
 
@@ -51,6 +73,7 @@
 .nav-links {
   display: flex;
   gap: 0.25rem;
+  align-items: center;
 }
 
 .nav-links a {
@@ -81,6 +104,24 @@
   height: 2px;
   background: #d1d5db;
   border-radius: 2px;
+}
+
+.logout-btn {
+  color: rgba(255, 255, 255, 0.8);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+  margin-left: 0.5rem;
+}
+
+.logout-btn:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
 .main-content {

@@ -1,7 +1,12 @@
 const { Router } = require('express');
 const UserController = require('../controllers/user.controller');
+const { verifyToken } = require('../middleware/auth.middleware');
 
 const router = Router();
+
+// Profile routes must come before /:id to avoid Express treating 'profile' as an ID
+router.get('/profile', verifyToken, UserController.getProfile);
+router.put('/profile', verifyToken, UserController.updateProfile);
 
 /**
  * @swagger
