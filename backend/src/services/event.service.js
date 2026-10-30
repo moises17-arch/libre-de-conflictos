@@ -101,14 +101,32 @@ class EventService {
   }
 
   static async deleteEvent(eventId, userId) {
-    const { rows } = await pool.query(
-      'DELETE FROM events WHERE id = $1 AND user_id = $2 RETURNING id',
-      [eventId, userId]
-    );
-    if (rows.length === 0) {
-      throw new Error('Evento no encontrado o no autorizado');
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      // Lock the row to prevent concurrent deletes racing
+      const ownerCheck = await client.query(
+        'SELECT id FROM events WHERE id = $1 AND user_id = $2 FOR UPDATE',
+        [eventId, userId]
+      );
+      if (ownerCheck.rows.length === 0) {
+        throw new Error('Evento no encontrado o no autorizado');
+      }
+
+      await client.query(
+        'DELETE FROM events WHERE id = $1 AND user_id = $2',
+        [eventId, userId]
+      );
+
+      await client.query('COMMIT');
+      return { deleted: true };
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
     }
-    return { deleted: true };
   }
 }
 

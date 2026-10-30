@@ -92,6 +92,10 @@ const UserController = {
 
   async remove(req, res) {
     try {
+      // Ownership check: only allow a user to delete their own account
+      if (parseInt(req.params.id, 10) !== req.user.id) {
+        return res.status(403).json({ success: false, message: 'No autorizado para eliminar este usuario' });
+      }
       const user = await UserModel.delete(req.params.id);
       if (!user) return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
       res.json({ success: true, message: 'Usuario eliminado correctamente' });

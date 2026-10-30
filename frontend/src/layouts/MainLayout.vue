@@ -21,8 +21,8 @@ async function handleLogout() {
       <nav class="nav-links">
         <RouterLink to="/">Inicio</RouterLink>
         <RouterLink to="/eventos">Eventos</RouterLink>
-        <RouterLink to="/calendario">Calendario</RouterLink>
-        <RouterLink to="/perfil">Perfil</RouterLink>
+        <RouterLink v-if="authStore.isAuthenticated" to="/calendario">Calendario</RouterLink>
+        <RouterLink v-if="authStore.isAuthenticated" to="/perfil">Perfil</RouterLink>
         <button
           v-if="authStore.isAuthenticated"
           class="logout-btn"
