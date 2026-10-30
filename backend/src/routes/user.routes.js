@@ -78,7 +78,7 @@ router.put('/profile', verifyToken, UserController.updateProfile);
  *                   items:
  *                     $ref: '#/components/schemas/User'
  */
-router.get('/', verifyToken, UserController.getAll);
+// GET / eliminado — expone emails de todos los usuarios sin necesidad de negocio
 
 /**
  * @swagger

@@ -93,7 +93,10 @@ function formatDate(iso: string | undefined) {
 }
 
 onMounted(() => {
-  eventStore.fetchEvents(authStore.user!.id);
+  authStore.initAuth();
+  if (authStore.user) {
+    eventStore.fetchEvents(authStore.user.id);
+  }
 });
 </script>
 
