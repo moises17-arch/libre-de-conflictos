@@ -4,6 +4,7 @@ import HomeView from '../views/HomeView.vue';
 import EventosView from '../views/EventosView.vue';
 import LoginView from '../views/LoginView.vue';
 import RegisterView from '../views/RegisterView.vue';
+import { useAuthStore } from '../store/authStore';
 
 const routes = [
   {
@@ -53,6 +54,10 @@ const router = createRouter({
 });
 
 router.beforeEach((to, _from, next) => {
+  const authStore = useAuthStore();
+  // Hydrate the store from localStorage on every navigation (handles page reloads)
+  authStore.initAuth();
+
   const token = localStorage.getItem('accessToken');
 
   if (to.meta.requiresAuth && !token) {

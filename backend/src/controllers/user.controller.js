@@ -24,6 +24,10 @@ const UserController = {
       if (!user) return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
       res.json({ success: true, data: { id: user.id, name: user.name, email: user.email, created_at: user.created_at } });
     } catch (err) {
+      // Postgres unique constraint violation on email column
+      if (err.code === '23505') {
+        return res.status(409).json({ success: false, message: 'El email ya está registrado por otro usuario' });
+      }
       res.status(500).json({ success: false, message: err.message });
     }
   },
@@ -68,6 +72,11 @@ const UserController = {
 
   async update(req, res) {
     try {
+      // Ownership check: only allow a user to update their own record
+      if (parseInt(req.params.id, 10) !== req.user.id) {
+        return res.status(403).json({ success: false, message: 'No autorizado para modificar este usuario' });
+      }
+
       const { name, email } = req.body;
       if (!name || !email) {
         return res.status(400).json({ success: false, message: 'name y email son requeridos' });
