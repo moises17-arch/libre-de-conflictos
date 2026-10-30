@@ -59,6 +59,27 @@ async function runMigrations() {
 
     console.log(`Tabla lista: ${entry.table}`);
   }
+
+  // Migrate start_time and end_time to TIMESTAMPTZ if they are still plain TIMESTAMP.
+  // All existing data is in UTC so the cast is safe.
+  const timestampCols = [
+    { table: 'events', column: 'start_time' },
+    { table: 'events', column: 'end_time' },
+  ];
+  for (const { table, column } of timestampCols) {
+    const { rows: typeRows } = await pool.query(
+      `SELECT data_type
+       FROM information_schema.columns
+       WHERE table_name = $1 AND column_name = $2`,
+      [table, column]
+    );
+    if (typeRows.length > 0 && typeRows[0].data_type === 'timestamp without time zone') {
+      await pool.query(
+        `ALTER TABLE ${table} ALTER COLUMN ${column} TYPE TIMESTAMPTZ USING ${column} AT TIME ZONE 'UTC'`
+      );
+      console.log(`Columna convertida a TIMESTAMPTZ: ${table}.${column}`);
+    }
+  }
 }
 
 module.exports = runMigrations;
