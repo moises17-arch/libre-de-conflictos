@@ -36,6 +36,17 @@ api.interceptors.response.use(
         window.location.href = '/login';
       }
     }
+    // Show toast for all non-401 errors (401 is handled silently above)
+    if (error.response?.status !== 401) {
+      const errorMessage =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        'Error de conexión';
+      // Lazily import to avoid circular deps at module init time
+      import('../store/toastStore').then(({ useToastStore }) => {
+        useToastStore().addToast(errorMessage, 'error');
+      });
+    }
     return Promise.reject(error);
   }
 );

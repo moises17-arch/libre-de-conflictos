@@ -3,9 +3,12 @@ import { ref, onMounted } from 'vue';
 import { useEventStore } from '../store/eventStore';
 import { useAuthStore } from '../store/authStore';
 import type { EventModel } from '../types/event';
+import { useToastStore } from '../store/toastStore';
+import EventFilter from '../components/EventFilter.vue';
 
 const eventStore = useEventStore();
 const authStore = useAuthStore();
+const toastStore = useToastStore();
 
 // Create form state
 const title = ref<string>('');
@@ -46,6 +49,9 @@ async function handleSubmit() {
     description.value = '';
     startTime.value = '';
     endTime.value = '';
+    toastStore.toastSuccess(result.message);
+  } else {
+    toastStore.toastError(result.message);
   }
 }
 
@@ -85,15 +91,21 @@ async function handleUpdate() {
   editIsError.value = !result.success;
   editFeedback.value = result.message;
   if (result.success) {
+    toastStore.toastSuccess(result.message);
     closeEdit();
+  } else {
+    toastStore.toastError(result.message);
   }
 }
 
 async function handleDelete(id: number) {
   if (!confirm('¿Seguro que quieres eliminar este evento?')) return;
   const result = await eventStore.deleteEvent(id);
-  isError.value = !result.success;
-  feedbackMessage.value = result.message;
+  if (result.success) {
+    toastStore.toastSuccess(result.message);
+  } else {
+    toastStore.toastError(result.message);
+  }
 }
 </script>
 
@@ -172,18 +184,20 @@ async function handleDelete(id: number) {
       <div class="events-card">
         <h2 class="card-title">📋 Mis Eventos</h2>
 
+        <EventFilter />
+
         <div v-if="eventStore.loading" class="state-msg">
           Cargando eventos...
         </div>
 
-        <div v-else-if="eventStore.events.length === 0" class="state-empty">
+        <div v-else-if="eventStore.filteredEvents.length === 0" class="state-empty">
           <span class="empty-icon">📭</span>
           <p>No hay eventos registrados aún.</p>
         </div>
 
         <div v-else>
           <div
-            v-for="ev in eventStore.events"
+            v-for="ev in eventStore.filteredEvents"
             :key="ev.id"
             class="event-item"
           >

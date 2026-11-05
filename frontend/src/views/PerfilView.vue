@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useAuthStore } from '../store/authStore';
+import { useToastStore } from '../store/toastStore';
 
 const authStore = useAuthStore();
+const toastStore = useToastStore();
 
 const name = ref('');
 const email = ref('');
@@ -44,8 +46,11 @@ async function handleSubmit() {
   feedbackMessage.value = result.message;
 
   if (result.success) {
+    toastStore.toastSuccess(result.message);
     newPassword.value = '';
     confirmPassword.value = '';
+  } else {
+    toastStore.toastError(result.message);
   }
 }
 

@@ -1,7 +1,8 @@
 <template>
   <router-view />
+  <ToastContainer />
 </template>
 
 <script setup lang="ts">
-// No necesitas importar MainLayout aquí, el router se encarga de cargarlo automáticamente.
+import ToastContainer from './components/ToastContainer.vue';
 </script>

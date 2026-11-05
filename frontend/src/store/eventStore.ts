@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { api } from '../services/api';
 import type { EventModel } from '../types/event';
 
@@ -8,6 +8,42 @@ export const useEventStore = defineStore('event', () => {
   const loading = ref<boolean>(false);
   const error = ref<string | null>(null);
   const stats = ref<{ total: number; upcoming: number; active: number } | null>(null);
+
+  const searchQuery = ref<string>('');
+  const filterDateFrom = ref<string>('');
+  const filterDateTo = ref<string>('');
+
+  const filteredEvents = computed(() => {
+    return events.value.filter(ev => {
+      const startRaw: string = (ev as any).start_time || ev.startTime || '';
+
+      // Text search
+      if (searchQuery.value.trim()) {
+        const q = searchQuery.value.toLowerCase();
+        const matchTitle = ev.title.toLowerCase().includes(q);
+        const matchDesc = (ev.description || '').toLowerCase().includes(q);
+        if (!matchTitle && !matchDesc) return false;
+      }
+
+      // Date from filter
+      if (filterDateFrom.value) {
+        const evDate = new Date(startRaw);
+        const fromDate = new Date(filterDateFrom.value);
+        if (evDate < fromDate) return false;
+      }
+
+      // Date to filter
+      if (filterDateTo.value) {
+        const evDate = new Date(startRaw);
+        // Set to end of day for the "to" date
+        const toDate = new Date(filterDateTo.value);
+        toDate.setHours(23, 59, 59, 999);
+        if (evDate > toDate) return false;
+      }
+
+      return true;
+    });
+  });
 
   async function fetchEvents(userId: number) {
     loading.value = true;
@@ -84,5 +120,5 @@ export const useEventStore = defineStore('event', () => {
     }
   }
 
-  return { events, loading, error, stats, fetchEvents, fetchStats, createEvent, updateEvent, deleteEvent };
+  return { events, loading, error, stats, searchQuery, filterDateFrom, filterDateTo, filteredEvents, fetchEvents, fetchStats, createEvent, updateEvent, deleteEvent };
 });
