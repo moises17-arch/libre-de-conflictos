@@ -4,6 +4,7 @@ const { verifyToken } = require('../middleware/auth.middleware');
 
 const router = Router();
 
+router.get('/stats', verifyToken, EventController.getStats);
 router.post('/', verifyToken, EventController.create);
 router.get('/user/:userId', verifyToken, EventController.getByUser);
 router.put('/:id', verifyToken, EventController.update);

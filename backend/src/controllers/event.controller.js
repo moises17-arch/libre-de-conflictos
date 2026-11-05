@@ -67,6 +67,15 @@ class EventController {
       return res.status(500).json({ error: 'Error interno del servidor' });
     }
   }
+
+  static async getStats(req, res, next) {
+    try {
+      const stats = await EventService.getStats(req.user.id);
+      return res.json(stats);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = EventController;

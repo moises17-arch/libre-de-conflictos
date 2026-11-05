@@ -7,6 +7,7 @@ export const useEventStore = defineStore('event', () => {
   const events = ref<EventModel[]>([]);
   const loading = ref<boolean>(false);
   const error = ref<string | null>(null);
+  const stats = ref<{ total: number; upcoming: number; active: number } | null>(null);
 
   async function fetchEvents(userId: number) {
     loading.value = true;
@@ -18,6 +19,15 @@ export const useEventStore = defineStore('event', () => {
       error.value = err.response?.data?.error || 'Error al cargar los eventos';
     } finally {
       loading.value = false;
+    }
+  }
+
+  async function fetchStats() {
+    try {
+      const response = await api.get<{ total: number; upcoming: number; active: number }>('/events/stats');
+      stats.value = response.data;
+    } catch (err: any) {
+      stats.value = null;
     }
   }
 
@@ -74,5 +84,5 @@ export const useEventStore = defineStore('event', () => {
     }
   }
 
-  return { events, loading, error, fetchEvents, createEvent, updateEvent, deleteEvent };
+  return { events, loading, error, stats, fetchEvents, fetchStats, createEvent, updateEvent, deleteEvent };
 });

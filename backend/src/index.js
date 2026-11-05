@@ -10,6 +10,7 @@ const userRoutes = require('./routes/user.routes');
 const eventRoutes = require('./routes/event.routes');
 const authRoutes = require('./routes/auth.routes');
 const { errorHandler } = require('./middleware/errorHandler');
+const logger = require('./config/logger');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -30,6 +31,12 @@ app.use(globalLimiter);
 // Auth-specific rate limiter (stricter)
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10 });
 
+// HTTP request logging
+app.use((req, res, next) => {
+  logger.info({ method: req.method, url: req.url, ip: req.ip });
+  next();
+});
+
 // Swagger docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -49,11 +56,11 @@ async function start() {
   try {
     await runMigrations();
     app.listen(PORT, () => {
-      console.log(`Servidor en http://localhost:${PORT}`);
-      console.log(`Swagger en  http://localhost:${PORT}/api-docs`);
+      logger.info(`Servidor en http://localhost:${PORT}`);
+      logger.info(`Swagger en  http://localhost:${PORT}/api-docs`);
     });
   } catch (err) {
-    console.error('Error al iniciar:', err.message);
+    logger.error('Error al iniciar:', err.message);
     process.exit(1);
   }
 }

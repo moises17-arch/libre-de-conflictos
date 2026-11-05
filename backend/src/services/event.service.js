@@ -100,6 +100,23 @@ class EventService {
     }
   }
 
+  static async getStats(userId) {
+    const { rows } = await pool.query(
+      `SELECT 
+        COUNT(*) AS total,
+        COUNT(*) FILTER (WHERE start_time > NOW()) AS upcoming,
+        COUNT(*) FILTER (WHERE start_time <= NOW() AND end_time >= NOW()) AS active
+       FROM events WHERE user_id = $1`,
+      [userId]
+    );
+    const row = rows[0];
+    return {
+      total: parseInt(row.total, 10),
+      upcoming: parseInt(row.upcoming, 10),
+      active: parseInt(row.active, 10)
+    };
+  }
+
   static async deleteEvent(eventId, userId) {
     const client = await pool.connect();
     try {
