@@ -21,14 +21,14 @@ withDefaults(defineProps<{
   100% { background-position: 200% 0; }
 }
 .skeleton-card {
-  padding: 1rem;
+  background: white;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  margin-bottom: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 0.625rem;
 }
 .skeleton-shimmer {
-  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 4px;

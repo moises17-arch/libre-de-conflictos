@@ -4,6 +4,7 @@
     <template v-if="authStore.isAuthenticated">
       <section class="dashboard">
         <h1 class="greeting">Hola, {{ authStore.user?.name }} 👋</h1>
+        <p class="greeting-sub">{{ todayStr }}</p>
 
         <!-- Stats row -->
         <div class="stats-grid">
@@ -12,17 +13,33 @@
           </template>
           <template v-else>
             <div class="stat-card">
-              <span class="stat-icon">📅</span>
+              <div class="stat-icon-wrap">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </div>
               <p class="stat-label">Total de Eventos</p>
               <p class="stat-value">{{ eventStore.stats?.total ?? '—' }}</p>
             </div>
             <div class="stat-card">
-              <span class="stat-icon">🔜</span>
+              <div class="stat-icon-wrap">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              </div>
               <p class="stat-label">Próximos Eventos</p>
               <p class="stat-value">{{ eventStore.stats?.upcoming ?? '—' }}</p>
             </div>
             <div class="stat-card">
-              <span class="stat-icon">⚡</span>
+              <div class="stat-icon-wrap">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+              </div>
               <p class="stat-label">Eventos Activos</p>
               <p class="stat-value">{{ eventStore.stats?.active ?? '—' }}</p>
             </div>
@@ -37,10 +54,9 @@
           </div>
           <ul v-else class="event-list">
             <li v-for="event in upcomingEvents" :key="event.id" class="event-item">
-              <span class="event-dot">●</span>
               <div class="event-info">
                 <p class="event-title">{{ event.title }}</p>
-                <p class="event-time">{{ formatDate(event.startTime) }}</p>
+                <span class="event-time">{{ formatDate(event.startTime) }}</span>
               </div>
             </li>
           </ul>
@@ -72,7 +88,14 @@
         <h2 class="features-title">¿Por qué Libre de Conflictos?</h2>
         <div class="features-grid">
           <div class="feature-card">
-            <span class="feature-icon">📅</span>
+            <div class="feature-icon-wrap">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </div>
             <h3 class="feature-card-title">Crea Eventos</h3>
             <p class="feature-card-desc">
               Registra tus compromisos con fecha, hora y zona horaria. Mantén todo organizado en un
@@ -80,7 +103,12 @@
             </p>
           </div>
           <div class="feature-card">
-            <span class="feature-icon">🔍</span>
+            <div class="feature-icon-wrap">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </div>
             <h3 class="feature-card-title">Detecta Conflictos</h3>
             <p class="feature-card-desc">
               El sistema verifica automáticamente si dos eventos se solapan en el tiempo y te avisa
@@ -88,7 +116,11 @@
             </p>
           </div>
           <div class="feature-card">
-            <span class="feature-icon">✅</span>
+            <div class="feature-icon-wrap">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
             <h3 class="feature-card-title">Sin solapamientos</h3>
             <p class="feature-card-desc">
               Organiza tu agenda con la certeza de que ningún evento interfiere con otro. Productividad
@@ -109,6 +141,8 @@ import SkeletonCard from '../components/SkeletonCard.vue';
 
 const authStore = useAuthStore();
 const eventStore = useEventStore();
+
+const todayStr = computed(() => new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
 
 const upcomingEvents = computed(() => {
   const now = new Date();
@@ -142,71 +176,81 @@ onMounted(async () => {
 <style scoped>
 /* Dashboard */
 .dashboard {
-  max-width: 960px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 2.5rem 1.5rem;
 }
 
 .greeting {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #29292a;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.greeting-sub {
+  color: #6b7280;
+  font-size: 0.9rem;
   margin-bottom: 2rem;
+  text-transform: capitalize;
 }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.25rem;
-  margin-bottom: 2.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
 .stat-card {
   background: white;
-  border-radius: 16px;
-  padding: 1.75rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
-  border: 1px solid rgba(29, 27, 31, 0.08);
-  text-align: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-.stat-icon {
-  font-size: 2rem;
-  display: block;
+.stat-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f4f5f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 0.75rem;
 }
 
 .stat-label {
-  font-size: 0.875rem;
-  color: #666668;
-  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
 }
 
 .stat-value {
-  font-size: 2.25rem;
-  font-weight: 800;
-  color: #29292a;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
 }
 
 /* Upcoming events */
 .upcoming-section {
   background: white;
-  border-radius: 16px;
-  padding: 1.75rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
-  border: 1px solid rgba(29, 27, 31, 0.08);
-  margin-bottom: 2rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .section-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #29292a;
-  margin-bottom: 1.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 1rem;
 }
 
 .empty-state {
-  color: #888;
+  color: #6b7280;
   font-size: 0.95rem;
 }
 
@@ -214,187 +258,197 @@ onMounted(async () => {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.875rem;
 }
 
 .event-item {
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
+  border-bottom: 1px solid #f3f4f6;
+  padding: 0.75rem 0;
 }
 
-.event-dot {
-  color: #444448;
-  font-size: 0.6rem;
-  flex-shrink: 0;
+.event-item:last-child {
+  border-bottom: none;
 }
 
 .event-info {
   display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .event-title {
-  font-weight: 600;
-  color: #29292a;
-  font-size: 0.95rem;
+  font-weight: 500;
+  color: #111827;
 }
 
 .event-time {
-  color: #666668;
-  font-size: 0.8rem;
+  display: inline-block;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+  white-space: nowrap;
 }
 
 /* Nav buttons */
 .nav-buttons {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
   flex-wrap: wrap;
 }
 
 .nav-btn {
-  padding: 0.75rem 1.75rem;
-  border-radius: 50px;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
   text-decoration: none;
-  font-size: 0.95rem;
-  font-weight: 600;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.2s;
 }
 
 .nav-btn.primary {
-  background: linear-gradient(135deg, #2c2b2e, #302f30);
+  background: #111827;
   color: white;
-  box-shadow: 0 4px 16px rgba(80, 77, 82, 0.35);
+}
+
+.nav-btn.primary:hover {
+  background: #1f2937;
 }
 
 .nav-btn.secondary {
   background: white;
-  color: #29292a;
-  border: 1px solid rgba(29, 27, 31, 0.2);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  color: #374151;
+  border: 1px solid #e5e7eb;
 }
 
-.nav-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+.nav-btn.secondary:hover {
+  background: #f9fafb;
 }
 
 /* Hero */
 .hero {
-  background: linear-gradient(135deg, #111111 0%, #2b2a2c 100%);
+  background: #1e2024;
   color: white;
-  text-align: center;
-  padding: 5rem 2rem;
+  padding: 4rem 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
+  text-align: center;
 }
 
 .badge {
-  background: rgba(53, 53, 54, 0.2);
-  border: 1px solid rgba(22, 20, 23, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
-  padding: 0.4rem 1rem;
-  font-size: 0.875rem;
-  color: #e4e0e9;
-  margin-bottom: 1.5rem;
+  padding: 0.3rem 0.875rem;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1.25rem;
+  display: inline-block;
 }
 
 .hero-title {
-  font-size: 3rem;
-  font-weight: 800;
-  margin-bottom: 1.5rem;
+  font-size: 2.5rem;
+  font-weight: 700;
   color: white;
+  margin-bottom: 1rem;
+  letter-spacing: -0.5px;
 }
 
 .hero-desc {
-  font-size: 1.125rem;
-  color: rgba(255, 255, 255, 0.8);
-  max-width: 600px;
-  margin: 0 auto 2.5rem;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 540px;
+  line-height: 1.65;
+  margin-bottom: 2rem;
 }
 
 .cta-button {
-  background: linear-gradient(135deg, #2c2b2e, #302f30);
-  color: white;
-  padding: 0.875rem 2.5rem;
-  border-radius: 50px;
+  background: white;
+  color: #111827;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
   text-decoration: none;
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: 600;
-  box-shadow: 0 4px 20px rgba(80, 77, 82, 0.4);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: background 0.2s;
 }
 
 .cta-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(41, 39, 42, 0.6);
+  background: #f9fafb;
 }
 
 /* Features */
 .features {
-  background: #f8f7ff;
-  padding: 4rem 2rem;
+  background: #f4f5f7;
+  padding: 3.5rem 2rem;
 }
 
 .features-title {
   text-align: center;
-  color: #29292a;
-  font-size: 2rem;
-  margin-bottom: 3rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 2.5rem;
 }
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
   max-width: 960px;
   margin: 0 auto;
 }
 
 .feature-card {
   background: white;
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(29, 27, 31, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s;
 }
 
 .feature-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.feature-icon {
-  font-size: 2.5rem;
+.feature-icon-wrap {
+  width: 44px;
+  height: 44px;
+  background: #f4f5f7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 1rem;
-  display: block;
 }
 
 .feature-card-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #444448;
-  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.5rem;
 }
 
 .feature-card-desc {
-  color: #363637;
+  color: #6b7280;
   line-height: 1.6;
+  font-size: 0.9rem;
 }
 
 /* Responsive */
 @media (max-width: 640px) {
   .hero-title {
-    font-size: 2rem;
+    font-size: 1.75rem;
   }
 
   .greeting {
-    font-size: 1.5rem;
+    font-size: 1.375rem;
   }
 }
 </style>

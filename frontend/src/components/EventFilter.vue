@@ -60,9 +60,9 @@ function clearFilters() {
 <style scoped>
 .event-filter {
   background: white;
-  border: 1px solid #e5e4e7;
-  border-radius: 12px;
-  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
   margin-bottom: 1rem;
 }
 
@@ -91,15 +91,16 @@ function clearFilters() {
 
 .filter-input {
   width: 100%;
-  padding: 0.55rem 0.75rem;
-  border: 1.5px solid #e5e4e7;
-  border-radius: 8px;
-  font-size: 0.9rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.875rem;
   outline: none;
   font-family: inherit;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   background: #fafafa;
   box-sizing: border-box;
+  color: #111827;
 }
 
 .filter-search .filter-input {
@@ -107,7 +108,8 @@ function clearFilters() {
 }
 
 .filter-input:focus {
-  border-color: #353436;
+  border-color: #374151;
+  box-shadow: 0 0 0 3px rgba(55, 65, 81, 0.08);
   background: white;
 }
 
@@ -126,7 +128,7 @@ function clearFilters() {
 .date-label {
   font-size: 0.7rem;
   font-weight: 600;
-  color: #6b6375;
+  color: #9ca3af;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -136,30 +138,31 @@ function clearFilters() {
 }
 
 .clear-btn {
-  padding: 0.5rem 0.875rem;
-  background: #f0f0f2;
-  color: #3d3d43;
-  border: none;
-  border-radius: 8px;
+  padding: 0.4rem 0.75rem;
+  background: transparent;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
   font-size: 0.8125rem;
-  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s;
   white-space: nowrap;
+  font-family: inherit;
 }
 
 .clear-btn:hover {
-  background: #e0e0e4;
+  background: #f4f5f7;
+  color: #374151;
 }
 
 .filter-count {
-  font-size: 0.8125rem;
-  color: #6b6375;
+  font-size: 0.8rem;
+  color: #9ca3af;
   margin: 0;
 }
 
 .filter-count strong {
-  color: #3d3d43;
+  color: #374151;
 }
 
 @media (max-width: 600px) {

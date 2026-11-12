@@ -128,7 +128,7 @@ async function handleDelete(id: number) {
     <div class="eventos-grid">
       <!-- Left column: Form -->
       <div class="form-card">
-        <h2 class="card-title">📝 Nuevo Evento</h2>
+        <h2 class="card-title">Nuevo Evento</h2>
 
         <form @submit.prevent="handleSubmit">
           <div class="form-group">
@@ -187,7 +187,7 @@ async function handleDelete(id: number) {
 
       <!-- Right column: Event list -->
       <div class="events-card">
-        <h2 class="card-title">📋 Mis Eventos</h2>
+        <h2 class="card-title">Mis Eventos</h2>
 
         <EventFilter />
 
@@ -197,7 +197,6 @@ async function handleDelete(id: number) {
 
         <template v-else>
           <div v-if="eventStore.filteredEvents.length === 0" class="state-empty">
-            <span class="empty-icon">📭</span>
             <p>No hay eventos registrados aún.</p>
           </div>
 
@@ -209,15 +208,15 @@ async function handleDelete(id: number) {
             >
               <p class="event-title">{{ ev.title }}</p>
               <p class="event-time">
-                🕒 De:
+                De:
                 {{ new Date(ev.startTime || (ev as any).start_time).toLocaleString() }}
                 hasta
                 {{ new Date(ev.endTime || (ev as any).end_time).toLocaleString() }}
               </p>
               <p v-if="ev.description" class="event-desc">{{ ev.description }}</p>
               <div class="event-actions">
-                <button class="btn-edit" @click="openEdit(ev)">✏️ Editar</button>
-                <button class="btn-delete" @click="handleDelete(ev.id!)">🗑️ Eliminar</button>
+                <button class="btn-edit" @click="openEdit(ev)">Editar</button>
+                <button class="btn-delete" @click="handleDelete(ev.id!)">Eliminar</button>
               </div>
             </div>
           </div>
@@ -245,7 +244,7 @@ async function handleDelete(id: number) {
     >
       <div class="edit-modal">
         <div class="modal-header">
-          <h3 class="modal-title">✏️ Editar Evento</h3>
+          <h3 class="modal-title">Editar Evento</h3>
           <button class="close-btn" @click="closeEdit">✕</button>
         </div>
 
@@ -296,19 +295,19 @@ async function handleDelete(id: number) {
 }
 
 .page-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .page-title {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: #3d3d43;
-  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.25rem;
 }
 
 .page-subtitle {
-  color: #58545d;
-  font-size: 1rem;
+  color: #6b7280;
+  font-size: 0.9rem;
 }
 
 /* Two-column grid */
@@ -329,17 +328,17 @@ async function handleDelete(id: number) {
 .form-card,
 .events-card {
   background: white;
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(54, 53, 55, 0.1);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .card-title {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #252526;
-  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 1.25rem;
 }
 
 /* Form */
@@ -350,54 +349,58 @@ async function handleDelete(id: number) {
 }
 
 .form-group label {
-  color: #303031;
-  font-weight: 600;
-  font-size: 0.875rem;
-  margin-bottom: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.4rem;
 }
 
 .form-group input,
-.form-group textarea {
+.form-group textarea,
+.form-group select {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 2px solid #e5e4e7;
-  border-radius: 10px;
-  font-size: 1rem;
-  transition: border-color 0.2s;
+  padding: 0.6875rem 0.875rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
   outline: none;
   box-sizing: border-box;
   font-family: inherit;
+  color: #111827;
+  background: white;
 }
 
 .form-group input:focus,
-.form-group textarea:focus {
-  border-color: #353436;
-  box-shadow: 0 0 0 3px rgba(50, 49, 50, 0.15);
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #374151;
+  box-shadow: 0 0 0 3px rgba(55, 65, 81, 0.1);
 }
 
 .submit-btn {
   width: 100%;
-  padding: 0.875rem;
-  background: linear-gradient(135deg, #353336, #474648);
+  padding: 0.75rem;
+  background: #111827;
   color: white;
   border: none;
-  border-radius: 10px;
-  font-size: 1rem;
+  border-radius: 8px;
+  font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s;
-  box-shadow: 0 4px 15px rgba(54, 52, 55, 0.3);
+  transition: background 0.2s;
+  font-family: inherit;
 }
 
 .submit-btn:hover {
-  transform: translateY(-2px);
+  background: #1f2937;
 }
 
 .feedback-message {
   margin-top: 1rem;
-  padding: 0.875rem 1rem;
-  border-radius: 10px;
-  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -405,112 +408,108 @@ async function handleDelete(id: number) {
 
 .feedback-error {
   background: #fef2f2;
-  color: #ef4444;
+  color: #dc2626;
   border: 1px solid #fecaca;
 }
 
 .feedback-success {
   background: #f0fdf4;
-  color: #10b981;
+  color: #059669;
   border: 1px solid #a7f3d0;
 }
 
 /* Event list */
-.state-msg {
-  text-align: center;
-  color: #6b6375;
-  padding: 2rem 0;
-}
-
 .state-empty {
   text-align: center;
-  color: #6b6375;
+  color: #6b7280;
   padding: 2rem 0;
-}
-
-.empty-icon {
-  font-size: 3rem;
-  display: block;
-  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
 }
 
 .event-item {
-  padding: 1rem;
-  border-radius: 10px;
-  border: 1px solid #e5e4e7;
-  margin-bottom: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  border-left: 3px solid #374151;
+  margin-bottom: 0.625rem;
   background: #fafafa;
-  transition: background 0.2s;
+  transition: background 0.15s;
 }
 
 .event-item:hover {
-  background: #f5f5f5;
+  background: #f4f5f7;
+}
+
+.event-item:hover .event-actions {
+  opacity: 1;
 }
 
 .event-title {
-  font-weight: 700;
-  color: #1a1a2e;
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #111827;
+  font-size: 0.9375rem;
+  margin-bottom: 0.25rem;
 }
 
 .event-time {
-  font-size: 0.8125rem;
-  color: #6b6375;
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
+  font-size: 0.8rem;
+  color: #6b7280;
 }
 
 .event-desc {
-  font-size: 0.875rem;
-  color: #6b6375;
-  margin-top: 0.375rem;
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-top: 0.25rem;
 }
 
 /* Edit/Delete actions */
 .event-actions {
   display: flex;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-}
-
-.btn-edit,
-.btn-delete {
-  padding: 0.35rem 0.75rem;
-  border-radius: 6px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: background 0.2s, transform 0.1s;
+  gap: 0.375rem;
+  margin-top: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.15s;
 }
 
 .btn-edit {
-  background: #f0f0f2;
-  color: #3d3d43;
+  background: #f4f5f7;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 0.3rem 0.625rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: inherit;
 }
 
 .btn-edit:hover {
-  background: #e0e0e4;
-  transform: translateY(-1px);
+  background: #e5e7eb;
 }
 
 .btn-delete {
   background: #fef2f2;
-  color: #ef4444;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 0.3rem 0.625rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: inherit;
 }
 
 .btn-delete:hover {
   background: #fee2e2;
-  transform: translateY(-1px);
 }
 
 /* Edit modal */
 .edit-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -520,40 +519,44 @@ async function handleDelete(id: number) {
 
 .edit-modal {
   background: white;
-  border-radius: 16px;
-  padding: 2rem;
+  border-radius: 10px;
+  padding: 1.75rem;
   width: 100%;
   max-width: 480px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  border: 1px solid #e5e7eb;
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .modal-title {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #252526;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
   margin: 0;
 }
 
 .close-btn {
   background: none;
   border: none;
-  font-size: 1.125rem;
+  font-size: 1rem;
   cursor: pointer;
-  color: #6b6375;
+  color: #6b7280;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   transition: background 0.2s;
+  font-family: inherit;
 }
 
 .close-btn:hover {
-  background: #f0f0f2;
+  background: #f4f5f7;
 }
 
 .modal-actions {
@@ -565,36 +568,37 @@ async function handleDelete(id: number) {
 .cancel-btn {
   flex: 1;
   padding: 0.75rem;
-  background: #f0f0f2;
-  color: #3d3d43;
-  border: none;
-  border-radius: 10px;
+  background: #f4f5f7;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: background 0.2s;
+  font-family: inherit;
 }
 
 .cancel-btn:hover {
-  background: #e0e0e4;
+  background: #e5e7eb;
 }
 
 .update-btn {
   flex: 1;
   padding: 0.75rem;
-  background: linear-gradient(135deg, #353336, #474648);
+  background: #111827;
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s;
-  box-shadow: 0 4px 15px rgba(54, 52, 55, 0.3);
+  transition: background 0.2s;
+  font-family: inherit;
 }
 
 .update-btn:hover {
-  transform: translateY(-1px);
+  background: #1f2937;
 }
 
 /* Pagination */
@@ -609,18 +613,19 @@ async function handleDelete(id: number) {
 
 .pagination button {
   padding: 0.4rem 1rem;
-  border: 1px solid #e5e4e7;
+  border: 1px solid #e5e7eb;
   border-radius: 6px;
   background: white;
-  color: #3d3d43;
+  color: #374151;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: background 0.2s;
+  font-family: inherit;
 }
 
 .pagination button:hover:not(:disabled) {
-  background: #f0f0f2;
+  background: #f4f5f7;
 }
 
 .pagination button:disabled {
@@ -630,6 +635,6 @@ async function handleDelete(id: number) {
 
 .pagination span {
   font-size: 0.875rem;
-  color: #6b6375;
+  color: #6b7280;
 }
 </style>

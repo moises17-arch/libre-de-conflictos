@@ -46,7 +46,14 @@ async function handleRegister() {
   <div class="auth-page">
     <div class="auth-card">
       <div class="auth-logo">
-        <span>📅</span>
+        <div class="auth-logo-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </div>
         <span class="auth-logo-text">Libre de Conflictos</span>
       </div>
 
@@ -123,7 +130,7 @@ async function handleRegister() {
 <style scoped>
 .auth-page {
   min-height: 100vh;
-  background: #f3f4f6;
+  background: #f4f5f7;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -132,39 +139,50 @@ async function handleRegister() {
 
 .auth-card {
   background: white;
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 2.5rem 2rem;
   width: 100%;
   max-width: 420px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(54, 53, 55, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 8px 24px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e5e7eb;
 }
 
 .auth-logo {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.625rem;
   margin-bottom: 1.75rem;
-  font-size: 1.25rem;
+  font-size: 1.0625rem;
+}
+
+.auth-logo-icon {
+  width: 36px;
+  height: 36px;
+  background: #111827;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .auth-logo-text {
   font-weight: 700;
-  color: #252526;
+  color: #111827;
 }
 
 .auth-title {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #3d3d43;
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: #111827;
   text-align: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.375rem;
 }
 
 .auth-subtitle {
-  color: #58545d;
-  font-size: 0.9rem;
+  color: #6b7280;
+  font-size: 0.875rem;
   text-align: center;
   margin-bottom: 1.75rem;
 }
@@ -178,61 +196,61 @@ async function handleRegister() {
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .form-group label {
-  color: #303031;
-  font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #374151;
 }
 
 .form-group input {
-  padding: 0.75rem 1rem;
-  border: 2px solid #e5e4e7;
-  border-radius: 10px;
-  font-size: 1rem;
+  padding: 0.6875rem 0.875rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.9375rem;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
   font-family: inherit;
+  color: #111827;
 }
 
 .form-group input:focus {
-  border-color: #353436;
-  box-shadow: 0 0 0 3px rgba(50, 49, 50, 0.15);
+  border-color: #374151;
+  box-shadow: 0 0 0 3px rgba(55, 65, 81, 0.1);
 }
 
 .feedback-error {
-  padding: 0.75rem 1rem;
-  border-radius: 10px;
   background: #fef2f2;
-  color: #ef4444;
+  color: #dc2626;
   border: 1px solid #fecaca;
-  font-weight: 500;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
   display: flex;
-  align-items: center;
   gap: 0.5rem;
-  font-size: 0.9rem;
+  align-items: center;
 }
 
 .submit-btn {
   width: 100%;
-  padding: 0.875rem;
-  background: linear-gradient(135deg, #353336, #474648);
+  padding: 0.75rem;
+  background: #111827;
   color: white;
   border: none;
-  border-radius: 10px;
-  font-size: 1rem;
+  border-radius: 8px;
+  font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s, opacity 0.2s;
-  box-shadow: 0 4px 15px rgba(54, 52, 55, 0.3);
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+  font-family: inherit;
 }
 
 .submit-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
+  background: #1f2937;
 }
 
 .submit-btn:disabled {
@@ -242,14 +260,14 @@ async function handleRegister() {
 
 .auth-link {
   text-align: center;
-  margin-top: 1.5rem;
-  font-size: 0.9rem;
-  color: #58545d;
+  margin-top: 1.25rem;
+  font-size: 0.875rem;
+  color: #6b7280;
 }
 
 .auth-link a {
-  color: #353436;
-  font-weight: 600;
+  color: #374151;
+  font-weight: 500;
   text-decoration: none;
 }
 

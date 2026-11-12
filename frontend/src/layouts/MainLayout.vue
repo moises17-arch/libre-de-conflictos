@@ -16,7 +16,12 @@ async function handleLogout() {
   <div class="layout-container">
     <header class="navbar">
       <RouterLink to="/" class="logo">
-        <span>📅</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
         <span>Libre de Conflictos</span>
       </RouterLink>
       <nav class="nav-links">
@@ -52,9 +57,9 @@ async function handleLogout() {
 }
 
 .navbar {
-  background: linear-gradient(135deg, #2b2b2d 0%, #2e2e2e 50%, #303031 100%);
-  padding: 0 2rem;
-  height: 64px;
+  background: #1e2024;
+  padding: 0 1.5rem;
+  height: 60px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -67,7 +72,7 @@ async function handleLogout() {
   gap: 0.5rem;
   color: white;
   text-decoration: none;
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 700;
 }
 
@@ -78,64 +83,56 @@ async function handleLogout() {
 }
 
 .nav-links a {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.75);
   text-decoration: none;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.875rem;
   border-radius: 6px;
-  position: relative;
+  font-size: 0.9rem;
   transition: color 0.2s, background 0.2s;
 }
 
 .nav-links a:hover {
   color: white;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .nav-links a.router-link-active {
   color: white;
   font-weight: 600;
-}
-
-.nav-links a.router-link-active::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0.5rem;
-  right: 0.5rem;
-  height: 2px;
-  background: #d1d5db;
-  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  border-left: 2px solid white;
 }
 
 .logout-btn {
   color: rgba(255, 255, 255, 0.8);
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 0.4rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 0.4rem 0.875rem;
   border-radius: 6px;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   cursor: pointer;
   transition: color 0.2s, background 0.2s, border-color 0.2s;
-  margin-left: 0.5rem;
+  margin-left: 0.25rem;
+  font-family: inherit;
 }
 
 .logout-btn:hover {
   color: white;
   background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.6);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .main-content {
   flex: 1;
-  background: #f3f4f6;
-  padding: 2rem 1rem;
+  background: #f4f5f7;
+  padding: 2rem 1.5rem;
 }
 
 .footer {
-  background: #1e1f20;
-  color: rgba(243, 239, 239, 0.6);
+  background: #1e2024;
+  color: #6b7280;
   text-align: center;
   padding: 1rem;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 </style>

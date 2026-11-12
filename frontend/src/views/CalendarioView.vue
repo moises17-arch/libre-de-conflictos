@@ -192,15 +192,15 @@ onMounted(() => {
 }
 
 .page-title {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: #3d3d43;
-  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.25rem;
 }
 
 .page-subtitle {
-  color: #58545d;
-  font-size: 1rem;
+  color: #6b7280;
+  font-size: 0.9rem;
 }
 
 .calendario-layout {
@@ -218,18 +218,18 @@ onMounted(() => {
 
 .calendar-card {
   background: white;
-  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
   padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(54, 53, 55, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   min-height: 500px;
 }
 
 .side-panel {
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(54, 53, 55, 0.1);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   overflow: hidden;
 }
 
@@ -237,15 +237,15 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid #e5e4e7;
-  background: #f8f8f8;
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
 }
 
 .panel-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #252526;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #111827;
   margin: 0;
 }
 
@@ -254,14 +254,15 @@ onMounted(() => {
   border: none;
   font-size: 1rem;
   cursor: pointer;
-  color: #6b6375;
+  color: #6b7280;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   transition: background 0.2s;
+  font-family: inherit;
 }
 
 .close-btn:hover {
-  background: #e5e4e7;
+  background: #e5e7eb;
 }
 
 .panel-body {
@@ -269,9 +270,9 @@ onMounted(() => {
 }
 
 .detail-title {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #1a1a2e;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: #111827;
   margin-bottom: 0.75rem;
 }
 
@@ -279,18 +280,18 @@ onMounted(() => {
   display: flex;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: #3d3d43;
+  color: #374151;
   margin-bottom: 0.5rem;
 }
 
 .detail-label {
   font-weight: 600;
-  color: #252526;
+  color: #111827;
 }
 
 .detail-desc {
   font-size: 0.875rem;
-  color: #6b6375;
+  color: #6b7280;
   margin-top: 0.75rem;
   line-height: 1.5;
 }
@@ -303,9 +304,9 @@ onMounted(() => {
 }
 
 .form-group label {
-  color: #303031;
-  font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #374151;
   margin-bottom: 0.4rem;
 }
 
@@ -313,35 +314,39 @@ onMounted(() => {
 .form-group textarea {
   width: 100%;
   padding: 0.6rem 0.875rem;
-  border: 2px solid #e5e4e7;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
   font-size: 0.875rem;
   outline: none;
   box-sizing: border-box;
   font-family: inherit;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  color: #111827;
+  background: white;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
-  border-color: #353436;
+  border-color: #374151;
+  box-shadow: 0 0 0 3px rgba(55, 65, 81, 0.1);
 }
 
 .submit-btn {
   width: 100%;
   padding: 0.75rem;
-  background: linear-gradient(135deg, #353336, #474648);
+  background: #111827;
   color: white;
   border: none;
   border-radius: 8px;
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: background 0.2s;
+  font-family: inherit;
 }
 
 .submit-btn:hover {
-  transform: translateY(-1px);
+  background: #1f2937;
 }
 
 .feedback-message {
@@ -349,7 +354,6 @@ onMounted(() => {
   padding: 0.75rem;
   border-radius: 8px;
   font-size: 0.875rem;
-  font-weight: 500;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -357,13 +361,45 @@ onMounted(() => {
 
 .feedback-error {
   background: #fef2f2;
-  color: #ef4444;
+  color: #dc2626;
   border: 1px solid #fecaca;
 }
 
 .feedback-success {
   background: #f0fdf4;
-  color: #10b981;
+  color: #059669;
   border: 1px solid #a7f3d0;
+}
+</style>
+
+<style>
+/* Global FullCalendar overrides — not scoped */
+.fc-button-primary {
+  background-color: #374151 !important;
+  border-color: #374151 !important;
+}
+.fc-button-primary:hover {
+  background-color: #1f2937 !important;
+  border-color: #1f2937 !important;
+}
+.fc-button-primary:not(:disabled):active,
+.fc-button-primary:not(:disabled).fc-button-active {
+  background-color: #1f2937 !important;
+  border-color: #1f2937 !important;
+}
+.fc-event {
+  background-color: #374151 !important;
+  border-color: #374151 !important;
+}
+.fc-col-header {
+  background: #f9fafb;
+}
+.fc-daygrid-day-number {
+  color: #374151 !important;
+}
+.fc-toolbar-title {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: #111827 !important;
 }
 </style>

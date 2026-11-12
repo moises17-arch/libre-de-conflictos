@@ -48,41 +48,38 @@ const icons: Record<string, string> = {
 }
 
 .toast-card {
+  background: white;
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
   display: flex;
   align-items: flex-start;
-  gap: 0.625rem;
-  padding: 0.875rem 1rem;
-  border-radius: 12px;
-  max-width: 360px;
-  min-width: 240px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-  font-size: 0.9rem;
+  gap: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  font-size: 0.875rem;
   font-weight: 500;
+  max-width: 360px;
+  min-width: 260px;
   pointer-events: all;
-  border: 1px solid transparent;
+  border-left: 4px solid #e5e7eb;
 }
 
 .toast-success {
-  background: #f0fdf4;
-  border-color: #86efac;
-  color: #166534;
+  border-left-color: #059669;
+  color: #065f46;
 }
 
 .toast-error {
-  background: #fef2f2;
-  border-color: #fca5a5;
+  border-left-color: #dc2626;
   color: #991b1b;
 }
 
 .toast-info {
-  background: #f0f9ff;
-  border-color: #7dd3fc;
-  color: #0c4a6e;
+  border-left-color: #374151;
+  color: #1f2937;
 }
 
 .toast-warning {
-  background: #fffbeb;
-  border-color: #fcd34d;
+  border-left-color: #d97706;
   color: #92400e;
 }
 
@@ -103,10 +100,11 @@ const icons: Record<string, string> = {
   cursor: pointer;
   font-size: 0.875rem;
   color: inherit;
-  opacity: 0.6;
+  opacity: 0.5;
   padding: 0;
   line-height: 1.4;
   transition: opacity 0.2s;
+  font-family: inherit;
 }
 
 .toast-close:hover {

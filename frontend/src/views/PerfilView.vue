@@ -70,7 +70,15 @@ function formatDate(dateStr: string | undefined) {
     <div class="perfil-grid">
       <!-- Edit form -->
       <div class="perfil-card">
-        <h2 class="card-title">✏️ Editar Información</h2>
+        <!-- Avatar section -->
+        <div class="avatar-section">
+          <div class="avatar">
+            {{ authStore.user?.name?.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase() || '?' }}
+          </div>
+          <p class="avatar-name">{{ authStore.user?.name || '—' }}</p>
+        </div>
+
+        <h2 class="card-title">Editar Información</h2>
 
         <form @submit.prevent="handleSubmit">
           <div class="form-group">
@@ -138,7 +146,7 @@ function formatDate(dateStr: string | undefined) {
 
       <!-- Info card -->
       <div class="info-card">
-        <h2 class="card-title">ℹ️ Información de cuenta</h2>
+        <h2 class="card-title">Información de cuenta</h2>
         <div class="info-row">
           <span class="info-label">Nombre</span>
           <span class="info-value">{{ authStore.user?.name || '—' }}</span>
@@ -158,24 +166,24 @@ function formatDate(dateStr: string | undefined) {
 
 <style scoped>
 .perfil-page {
-  max-width: 900px;
+  max-width: 700px;
   margin: 0 auto;
 }
 
 .page-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .page-title {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: #3d3d43;
-  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.25rem;
 }
 
 .page-subtitle {
-  color: #58545d;
-  font-size: 1rem;
+  color: #6b7280;
+  font-size: 0.9rem;
 }
 
 .perfil-grid {
@@ -194,17 +202,43 @@ function formatDate(dateStr: string | undefined) {
 .perfil-card,
 .info-card {
   background: white;
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(54, 53, 55, 0.1);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+/* Avatar */
+.avatar-section {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  background: #374151;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.5rem;
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.avatar-name {
+  font-weight: 600;
+  color: #111827;
+  font-size: 0.9375rem;
 }
 
 .card-title {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #252526;
-  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 1.25rem;
 }
 
 .form-group {
@@ -214,93 +248,93 @@ function formatDate(dateStr: string | undefined) {
 }
 
 .form-group label {
-  color: #303031;
-  font-weight: 600;
-  font-size: 0.875rem;
-  margin-bottom: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.4rem;
 }
 
 .form-group input {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 2px solid #e5e4e7;
-  border-radius: 10px;
-  font-size: 1rem;
+  padding: 0.6875rem 0.875rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.9375rem;
   outline: none;
   box-sizing: border-box;
   font-family: inherit;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  color: #111827;
 }
 
 .form-group input:focus {
-  border-color: #353436;
-  box-shadow: 0 0 0 3px rgba(50, 49, 50, 0.15);
+  border-color: #374151;
+  box-shadow: 0 0 0 3px rgba(55, 65, 81, 0.1);
 }
 
 .divider {
   border: none;
-  border-top: 1px solid #e5e4e7;
-  margin: 1.25rem 0 1rem;
+  border-top: 1px solid #e5e7eb;
+  margin: 1.25rem 0;
 }
 
 .section-label {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: #6b6375;
+  color: #9ca3af;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   margin-bottom: 1rem;
 }
 
 .submit-btn {
   width: 100%;
-  padding: 0.875rem;
-  background: linear-gradient(135deg, #353336, #474648);
+  padding: 0.75rem;
+  background: #111827;
   color: white;
   border: none;
-  border-radius: 10px;
-  font-size: 1rem;
+  border-radius: 8px;
+  font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s;
-  box-shadow: 0 4px 15px rgba(54, 52, 55, 0.3);
+  transition: background 0.2s;
   margin-top: 0.25rem;
+  font-family: inherit;
 }
 
 .submit-btn:hover {
-  transform: translateY(-2px);
+  background: #1f2937;
 }
 
 .feedback-message {
   margin-top: 1rem;
-  padding: 0.875rem 1rem;
-  border-radius: 10px;
-  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
 }
 
 .feedback-error {
   background: #fef2f2;
-  color: #ef4444;
+  color: #dc2626;
   border: 1px solid #fecaca;
 }
 
 .feedback-success {
   background: #f0fdf4;
-  color: #10b981;
+  color: #059669;
   border: 1px solid #a7f3d0;
 }
 
 /* Info card */
 .info-row {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f3f4f6;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  padding: 0.875rem 0;
-  border-bottom: 1px solid #f0eff2;
 }
 
 .info-row:last-child {
@@ -308,16 +342,16 @@ function formatDate(dateStr: string | undefined) {
 }
 
 .info-label {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: #6b6375;
+  color: #9ca3af;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 
 .info-value {
   font-size: 0.9375rem;
-  color: #3d3d43;
+  color: #111827;
   font-weight: 500;
 }
 </style>
