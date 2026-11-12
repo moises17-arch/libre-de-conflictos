@@ -4,6 +4,7 @@ import HomeView from '../views/HomeView.vue';
 import EventosView from '../views/EventosView.vue';
 import LoginView from '../views/LoginView.vue';
 import RegisterView from '../views/RegisterView.vue';
+import NotFoundView from '../views/NotFoundView.vue';
 import { useAuthStore } from '../store/authStore';
 
 const routes = [
@@ -45,7 +46,8 @@ const routes = [
     path: '/registro',
     name: 'Registro',
     component: RegisterView
-  }
+  },
+  { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundView }
 ];
 
 const router = createRouter({

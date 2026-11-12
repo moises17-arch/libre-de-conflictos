@@ -36,8 +36,16 @@ api.interceptors.response.use(
         window.location.href = '/login';
       }
     }
-    // Show toast for all non-401 errors (401 is handled silently above)
-    if (error.response?.status !== 401) {
+    // Error de infraestructura: mostrar siempre aunque sea ruta de auth
+    if (error.response?.status === 429) {
+      import('../store/toastStore').then(({ useToastStore }) => {
+        useToastStore().addToast('Demasiados intentos. Espera unos minutos antes de intentarlo de nuevo.', 'error');
+      });
+      return Promise.reject(error);
+    }
+    // No mostrar toast en rutas de auth — esas vistas manejan su propio feedback
+    const isAuthRoute = originalRequest?.url?.includes('/auth/');
+    if (error.response?.status !== 401 && !isAuthRoute) {
       const errorMessage =
         error.response?.data?.error ||
         error.response?.data?.message ||

@@ -18,9 +18,10 @@ async function handleLogin() {
     await authStore.login(email.value, password.value);
     router.push('/eventos');
   } catch (err: any) {
+    const data = err.response?.data;
     errorMessage.value =
-      err.response?.data?.error ||
-      err.response?.data?.message ||
+      data?.error ||
+      data?.message ||
       'Correo o contraseña incorrectos.';
   } finally {
     loading.value = false;

@@ -28,8 +28,11 @@ app.use(cookieParser());
 const globalLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
 app.use(globalLimiter);
 
-// Auth-specific rate limiter (stricter)
-const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10 });
+// Auth-specific rate limiter — más permisivo en desarrollo
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'production' ? 10 : 100
+});
 
 // HTTP request logging
 app.use((req, res, next) => {

@@ -11,7 +11,7 @@ class EventService {
 
       // Motor matemático de solapamientos: StartA < EndB AND EndA > StartB
       const overlapQuery = `
-        SELECT id FROM events 
+        SELECT id, title, start_time, end_time FROM events 
         WHERE user_id = $1 
           AND start_time < $3 
           AND end_time > $2
@@ -20,7 +20,8 @@ class EventService {
       const conflictCheck = await client.query(overlapQuery, [userId, startTime, endTime]);
 
       if (conflictCheck.rows.length > 0) {
-        throw new Error('Conflicto de horario: El intervalo se solapa con otro evento existente.');
+        const c = conflictCheck.rows[0];
+        throw new Error(`Conflicto de horario: Se solapa con "${c.title}" (${c.start_time} - ${c.end_time})`);
       }
 
       const insertQuery = `
@@ -72,14 +73,15 @@ class EventService {
 
       // Check overlaps excluding the event being updated
       const overlapCheck = await client.query(
-        `SELECT id FROM events
+        `SELECT id, title, start_time, end_time FROM events
          WHERE user_id = $1 AND id != $2
            AND start_time < $4 AND end_time > $3
          FOR UPDATE`,
         [userId, eventId, startTime, endTime]
       );
       if (overlapCheck.rows.length > 0) {
-        throw new Error('Conflicto de horario: El intervalo se solapa con otro evento existente.');
+        const c = overlapCheck.rows[0];
+        throw new Error(`Conflicto de horario: Se solapa con "${c.title}" (${c.start_time} - ${c.end_time})`);
       }
 
       const { rows } = await client.query(

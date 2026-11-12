@@ -26,10 +26,16 @@ async function handleRegister() {
     await authStore.register(name.value, email.value, password.value);
     router.push('/eventos');
   } catch (err: any) {
-    errorMessage.value =
-      err.response?.data?.error ||
-      err.response?.data?.message ||
-      'Error al crear la cuenta. Intenta de nuevo.';
+    const data = err.response?.data;
+    if (data?.errors && Array.isArray(data.errors)) {
+      // Errores de validación Zod: array de { message }
+      errorMessage.value = data.errors.map((e: any) => e.message).join(', ');
+    } else {
+      errorMessage.value =
+        data?.error ||
+        data?.message ||
+        'Error al crear la cuenta. Intenta de nuevo.';
+    }
   } finally {
     loading.value = false;
   }
