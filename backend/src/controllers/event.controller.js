@@ -28,8 +28,10 @@ class EventController {
       if (parseInt(userId, 10) !== req.user.id) {
         return res.status(403).json({ error: 'No autorizado para ver eventos de otro usuario' });
       }
-      const events = await EventService.getEventsByUser(userId);
-      return res.json(events);
+      const page = parseInt(req.query.page, 10) || 1;
+      const limit = parseInt(req.query.limit, 10) || 20;
+      const { events, total, totalPages } = await EventService.getEventsByUser(userId, { page, limit });
+      return res.json({ events, total, page, limit, totalPages });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: 'Error al obtener los eventos' });

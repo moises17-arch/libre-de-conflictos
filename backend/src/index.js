@@ -1,5 +1,14 @@
 require('dotenv').config();
+
+const REQUIRED_ENV = ['JWT_SECRET', 'JWT_REFRESH_SECRET', 'DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD'];
+const missing = REQUIRED_ENV.filter(k => !process.env[k]);
+if (missing.length > 0) {
+  console.error(`Variables de entorno faltantes: ${missing.join(', ')}`);
+  process.exit(1);
+}
+
 const express = require('express');
+const helmet = require('helmet');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
@@ -14,6 +23,9 @@ const logger = require('./config/logger');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Security headers
+app.use(helmet());
 
 // CORS before anything else
 app.use(cors({

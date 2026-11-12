@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const EventRepository = require('../repositories/event.repository');
 
 class EventService {
   static async createEvent(userId, eventData) {
@@ -48,12 +49,9 @@ class EventService {
     }
   }
 
-  static async getEventsByUser(userId) {
-    const { rows } = await pool.query(
-      'SELECT * FROM events WHERE user_id = $1 ORDER BY start_time ASC',
-      [userId]
-    );
-    return rows;
+  static async getEventsByUser(userId, { page = 1, limit = 20 } = {}) {
+    const { events, total } = await EventRepository.findByUserId(userId, { page, limit });
+    return { events, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
   static async updateEvent(eventId, userId, eventData) {
