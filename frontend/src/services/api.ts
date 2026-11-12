@@ -33,7 +33,12 @@ api.interceptors.response.use(
       } catch {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('user');
-        window.location.href = '/login';
+        try {
+          const { default: router } = await import('../router');
+          router.push('/login');
+        } catch {
+          window.location.href = '/login';
+        }
       }
     }
     // Error de infraestructura: mostrar siempre aunque sea ruta de auth

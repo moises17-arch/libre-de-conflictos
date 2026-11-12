@@ -7,21 +7,26 @@
 
         <!-- Stats row -->
         <div class="stats-grid">
-          <div class="stat-card">
-            <span class="stat-icon">📅</span>
-            <p class="stat-label">Total de Eventos</p>
-            <p class="stat-value">{{ eventStore.stats?.total ?? '—' }}</p>
-          </div>
-          <div class="stat-card">
-            <span class="stat-icon">🔜</span>
-            <p class="stat-label">Próximos Eventos</p>
-            <p class="stat-value">{{ eventStore.stats?.upcoming ?? '—' }}</p>
-          </div>
-          <div class="stat-card">
-            <span class="stat-icon">⚡</span>
-            <p class="stat-label">Eventos Activos</p>
-            <p class="stat-value">{{ eventStore.stats?.active ?? '—' }}</p>
-          </div>
+          <template v-if="eventStore.loading">
+            <SkeletonCard v-for="n in 3" :key="n" :lines="1" :showTitle="true" />
+          </template>
+          <template v-else>
+            <div class="stat-card">
+              <span class="stat-icon">📅</span>
+              <p class="stat-label">Total de Eventos</p>
+              <p class="stat-value">{{ eventStore.stats?.total ?? '—' }}</p>
+            </div>
+            <div class="stat-card">
+              <span class="stat-icon">🔜</span>
+              <p class="stat-label">Próximos Eventos</p>
+              <p class="stat-value">{{ eventStore.stats?.upcoming ?? '—' }}</p>
+            </div>
+            <div class="stat-card">
+              <span class="stat-icon">⚡</span>
+              <p class="stat-label">Eventos Activos</p>
+              <p class="stat-value">{{ eventStore.stats?.active ?? '—' }}</p>
+            </div>
+          </template>
         </div>
 
         <!-- Upcoming events list -->
@@ -100,6 +105,7 @@
 import { computed, onMounted } from 'vue';
 import { useAuthStore } from '../store/authStore';
 import { useEventStore } from '../store/eventStore';
+import SkeletonCard from '../components/SkeletonCard.vue';
 
 const authStore = useAuthStore();
 const eventStore = useEventStore();

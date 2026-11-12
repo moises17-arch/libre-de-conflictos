@@ -6,6 +6,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { useEventStore } from '../store/eventStore';
 import { useAuthStore } from '../store/authStore';
 import type { EventModel } from '../types/event';
+import SkeletonCard from '../components/SkeletonCard.vue';
 
 const eventStore = useEventStore();
 const authStore = useAuthStore();
@@ -110,7 +111,12 @@ onMounted(() => {
     <div class="calendario-layout">
       <!-- Calendar -->
       <div class="calendar-card">
-        <FullCalendar :options="calendarOptions" />
+        <template v-if="eventStore.loading">
+          <SkeletonCard :lines="5" :showTitle="true" />
+        </template>
+        <template v-else>
+          <FullCalendar :options="calendarOptions" />
+        </template>
       </div>
 
       <!-- Event detail panel -->

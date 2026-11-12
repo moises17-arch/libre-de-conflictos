@@ -13,6 +13,10 @@ export const useEventStore = defineStore('event', () => {
   const filterDateFrom = ref<string>('');
   const filterDateTo = ref<string>('');
 
+  const currentPage = ref(1);
+  const totalPages = ref(1);
+  const totalEvents = ref(0);
+
   const filteredEvents = computed(() => {
     return events.value.filter(ev => {
       const startRaw: string = (ev as any).start_time || ev.startTime || '';
@@ -45,12 +49,24 @@ export const useEventStore = defineStore('event', () => {
     });
   });
 
-  async function fetchEvents(userId: number) {
+  async function fetchEvents(userId: number, page = 1) {
     loading.value = true;
     error.value = null;
     try {
-      const response = await api.get<EventModel[]>(`/events/user/${userId}`);
-      events.value = response.data;
+      const response = await api.get<EventModel[] | { events: EventModel[]; currentPage: number; totalPages: number; totalEvents: number }>(`/events/user/${userId}?page=${page}&limit=20`);
+      const data = response.data;
+      if (Array.isArray(data)) {
+        // Backend doesn't support pagination yet — treat as full list
+        events.value = data;
+        currentPage.value = 1;
+        totalPages.value = 1;
+        totalEvents.value = data.length;
+      } else {
+        events.value = data.events;
+        currentPage.value = data.currentPage;
+        totalPages.value = data.totalPages;
+        totalEvents.value = data.totalEvents;
+      }
     } catch (err: any) {
       error.value = err.response?.data?.error || 'Error al cargar los eventos';
     } finally {
@@ -120,5 +136,5 @@ export const useEventStore = defineStore('event', () => {
     }
   }
 
-  return { events, loading, error, stats, searchQuery, filterDateFrom, filterDateTo, filteredEvents, fetchEvents, fetchStats, createEvent, updateEvent, deleteEvent };
+  return { events, loading, error, stats, searchQuery, filterDateFrom, filterDateTo, filteredEvents, currentPage, totalPages, totalEvents, fetchEvents, fetchStats, createEvent, updateEvent, deleteEvent };
 });

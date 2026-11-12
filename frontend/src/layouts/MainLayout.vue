@@ -6,6 +6,7 @@ const router = useRouter();
 const authStore = useAuthStore();
 
 async function handleLogout() {
+  if (!confirm('¿Seguro que quieres cerrar sesión?')) return;
   await authStore.logout();
   router.push('/login');
 }

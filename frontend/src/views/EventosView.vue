@@ -5,6 +5,7 @@ import { useAuthStore } from '../store/authStore';
 import type { EventModel } from '../types/event';
 import { useToastStore } from '../store/toastStore';
 import EventFilter from '../components/EventFilter.vue';
+import SkeletonCard from '../components/SkeletonCard.vue';
 
 const eventStore = useEventStore();
 const authStore = useAuthStore();
@@ -32,6 +33,10 @@ const editIsError = ref(false);
 onMounted(() => {
   eventStore.fetchEvents(authStore.user!.id);
 });
+
+function changePage(page: number) {
+  eventStore.fetchEvents(authStore.user!.id, page);
+}
 
 async function handleSubmit() {
   feedbackMessage.value = '';
@@ -186,35 +191,49 @@ async function handleDelete(id: number) {
 
         <EventFilter />
 
-        <div v-if="eventStore.loading" class="state-msg">
-          Cargando eventos...
-        </div>
+        <template v-if="eventStore.loading">
+          <SkeletonCard v-for="n in 3" :key="n" :lines="3" :showTitle="true" />
+        </template>
 
-        <div v-else-if="eventStore.filteredEvents.length === 0" class="state-empty">
-          <span class="empty-icon">📭</span>
-          <p>No hay eventos registrados aún.</p>
-        </div>
+        <template v-else>
+          <div v-if="eventStore.filteredEvents.length === 0" class="state-empty">
+            <span class="empty-icon">📭</span>
+            <p>No hay eventos registrados aún.</p>
+          </div>
 
-        <div v-else>
-          <div
-            v-for="ev in eventStore.filteredEvents"
-            :key="ev.id"
-            class="event-item"
-          >
-            <p class="event-title">{{ ev.title }}</p>
-            <p class="event-time">
-              🕒 De:
-              {{ new Date(ev.startTime || (ev as any).start_time).toLocaleString() }}
-              hasta
-              {{ new Date(ev.endTime || (ev as any).end_time).toLocaleString() }}
-            </p>
-            <p v-if="ev.description" class="event-desc">{{ ev.description }}</p>
-            <div class="event-actions">
-              <button class="btn-edit" @click="openEdit(ev)">✏️ Editar</button>
-              <button class="btn-delete" @click="handleDelete(ev.id!)">🗑️ Eliminar</button>
+          <div v-else>
+            <div
+              v-for="ev in eventStore.filteredEvents"
+              :key="ev.id"
+              class="event-item"
+            >
+              <p class="event-title">{{ ev.title }}</p>
+              <p class="event-time">
+                🕒 De:
+                {{ new Date(ev.startTime || (ev as any).start_time).toLocaleString() }}
+                hasta
+                {{ new Date(ev.endTime || (ev as any).end_time).toLocaleString() }}
+              </p>
+              <p v-if="ev.description" class="event-desc">{{ ev.description }}</p>
+              <div class="event-actions">
+                <button class="btn-edit" @click="openEdit(ev)">✏️ Editar</button>
+                <button class="btn-delete" @click="handleDelete(ev.id!)">🗑️ Eliminar</button>
+              </div>
             </div>
           </div>
-        </div>
+
+          <div class="pagination" v-if="eventStore.totalPages > 1">
+            <button
+              :disabled="eventStore.currentPage <= 1"
+              @click="changePage(eventStore.currentPage - 1)"
+            >Anterior</button>
+            <span>Página {{ eventStore.currentPage }} de {{ eventStore.totalPages }}</span>
+            <button
+              :disabled="eventStore.currentPage >= eventStore.totalPages"
+              @click="changePage(eventStore.currentPage + 1)"
+            >Siguiente</button>
+          </div>
+        </template>
       </div>
     </div>
 
@@ -576,5 +595,41 @@ async function handleDelete(id: number) {
 
 .update-btn:hover {
   transform: translateY(-1px);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.pagination button {
+  padding: 0.4rem 1rem;
+  border: 1px solid #e5e4e7;
+  border-radius: 6px;
+  background: white;
+  color: #3d3d43;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #f0f0f2;
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-size: 0.875rem;
+  color: #6b6375;
 }
 </style>
