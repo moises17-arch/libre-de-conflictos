@@ -1,11 +1,39 @@
+/**
+ * @file routes/user.routes.js
+ * @description Rutas protegidas de gestión de usuarios.
+ *
+ * Registra todos los endpoints relacionados con usuarios. TODAS las rutas de este
+ * archivo requieren el middleware verifyToken, es decir, el cliente debe enviar
+ * un access token válido en el header Authorization: Bearer <token>.
+ *
+ * Se monta en `/api/users` desde index.js: app.use('/api/users', userRoutes)
+ *
+ * ORDEN IMPORTANTE: Las rutas /profile deben registrarse ANTES que /:id.
+ * Express evalúa las rutas en el orden en que se registran. Si /:id se registrara
+ * primero, una petición a GET /api/users/profile haría que Express interprete
+ * 'profile' como el valor del parámetro :id (un número esperado), lo que
+ * causaría una consulta con id='profile' y probablemente un error de base de datos.
+ *
+ * Conexiones:
+ *  - controllers/user.controller.js → maneja la lógica de cada endpoint
+ *  - middleware/auth.middleware.js → verifyToken protege todas las rutas
+ *  - Montado en index.js: app.use('/api/users', userRoutes)
+ */
+
 const { Router } = require('express');
 const UserController = require('../controllers/user.controller');
 const { verifyToken } = require('../middleware/auth.middleware');
 
 const router = Router();
 
-// Profile routes must come before /:id to avoid Express treating 'profile' as an ID
+// GET /api/users/profile
+// Devuelve el perfil del usuario autenticado (datos del token, no de un :id en la URL).
+// DEBE ir antes de /:id para que 'profile' no sea interpretado como un ID numérico.
 router.get('/profile', verifyToken, UserController.getProfile);
+
+// PUT /api/users/profile
+// Actualiza nombre, email y opcionalmente la contraseña del usuario autenticado.
+// DEBE ir antes de /:id por la misma razón que el GET anterior.
 router.put('/profile', verifyToken, UserController.updateProfile);
 
 /**
@@ -107,6 +135,7 @@ router.put('/profile', verifyToken, UserController.updateProfile);
  *       404:
  *         description: Usuario no encontrado
  */
+// GET /api/users/:id → busca un usuario por su ID numérico
 router.get('/:id', verifyToken, UserController.getById);
 
 /**
@@ -138,6 +167,7 @@ router.get('/:id', verifyToken, UserController.getById);
  *       409:
  *         description: Email ya registrado
  */
+// POST /api/users → crea un nuevo usuario (ruta administrativa; requiere token)
 router.post('/', verifyToken, UserController.create);
 
 /**
@@ -164,6 +194,7 @@ router.post('/', verifyToken, UserController.create);
  *       404:
  *         description: Usuario no encontrado
  */
+// PUT /api/users/:id → actualiza nombre y email; el controlador verifica ownership
 router.put('/:id', verifyToken, UserController.update);
 
 /**
@@ -184,6 +215,7 @@ router.put('/:id', verifyToken, UserController.update);
  *       404:
  *         description: Usuario no encontrado
  */
+// DELETE /api/users/:id → elimina la cuenta; el controlador verifica ownership
 router.delete('/:id', verifyToken, UserController.remove);
 
 module.exports = router;
