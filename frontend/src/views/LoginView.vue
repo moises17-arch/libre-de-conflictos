@@ -1,4 +1,25 @@
 <script setup lang="ts">
+/*
+ * views/LoginView.vue — Vista de inicio de sesión
+ *
+ * Maneja el flujo completo de autenticación:
+ *   1. El usuario ingresa email y contraseña.
+ *   2. Se llama a authStore.login() que hace POST /auth/login.
+ *   3. Si tiene éxito, el store guarda el token y redirige a /eventos.
+ *   4. Si falla, se extrae el mensaje de error del backend y se muestra
+ *      INLINE debajo del formulario (no como toast), porque esta vista
+ *      es responsable de su propio feedback de autenticación.
+ *
+ * Nota sobre errores inline vs toast:
+ *   Los errores de credenciales incorrectas (401) se muestran aquí directamente
+ *   y NO generan un toast global. El interceptor de api.ts omite el toast para
+ *   rutas /auth/ precisamente para dejar que esta vista los gestione así.
+ *
+ * Conexiones:
+ *   → store/authStore.ts  (acción login, estado isAuthenticated)
+ *   → router/index.ts     (redirige a /eventos tras login exitoso)
+ *   → services/api.ts     (interceptor omite toast de error para esta ruta)
+ */
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../store/authStore';
@@ -8,9 +29,21 @@ const authStore = useAuthStore();
 
 const email = ref('');
 const password = ref('');
+// Mensaje de error visible bajo el formulario; vacío cuando no hay error
 const errorMessage = ref('');
+// true mientras espera la respuesta del backend: deshabilita el botón para evitar doble envío
 const loading = ref(false);
 
+/**
+ * Maneja el envío del formulario de login.
+ *
+ * Flujo:
+ *   1. Limpia cualquier error previo y activa el estado loading.
+ *   2. Llama a authStore.login() (que internamente guarda token y user en localStorage).
+ *   3. Si tiene éxito → redirige a /eventos.
+ *   4. Si falla → extrae el mensaje del objeto de error de Axios y lo muestra inline.
+ *      El finally() garantiza que loading se desactive siempre, incluso si hay error.
+ */
 async function handleLogin() {
   errorMessage.value = '';
   loading.value = true;
@@ -19,11 +52,13 @@ async function handleLogin() {
     router.push('/eventos');
   } catch (err: any) {
     const data = err.response?.data;
+    // Intentar extraer el mensaje específico del backend; si no viene, usar mensaje genérico
     errorMessage.value =
       data?.error ||
       data?.message ||
       'Correo o contraseña incorrectos.';
   } finally {
+    // Se ejecuta siempre: restaura el botón haya o no error
     loading.value = false;
   }
 }
@@ -72,11 +107,13 @@ async function handleLogin() {
           />
         </div>
 
+        <!-- Error inline: aparece debajo de los campos, no como toast flotante -->
         <div v-if="errorMessage" class="feedback-error" role="alert">
           <span>❌</span>
           <span>{{ errorMessage }}</span>
         </div>
 
+        <!-- El botón queda deshabilitado mientras se espera respuesta del backend -->
         <button type="submit" class="submit-btn" :disabled="loading">
           {{ loading ? 'Ingresando...' : 'Iniciar Sesión' }}
         </button>

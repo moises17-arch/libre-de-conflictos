@@ -1,10 +1,37 @@
 <script setup lang="ts">
+/*
+ * layouts/MainLayout.vue — Layout principal de la aplicación
+ *
+ * Este componente envuelve todas las vistas que usan el diseño estándar
+ * con barra de navegación superior y pie de página. Las únicas vistas que
+ * NO pasan por aquí son LoginView y RegisterView, que tienen su propio
+ * diseño de pantalla completa.
+ *
+ * Estructura del layout:
+ *   <header>  → Navbar con logo, links de navegación y botón de logout
+ *   <main>    → <router-view> donde se inyectan las vistas hijas (Home, Eventos, etc.)
+ *   <footer>  → Pie de página con copyright
+ *
+ * Conexiones:
+ *   → store/authStore.ts  (lee isAuthenticated para mostrar/ocultar links)
+ *   → router/index.ts     (el layout se registra como componente padre de las rutas hijas)
+ *   → views/HomeView.vue, EventosView.vue, CalendarioView.vue, PerfilView.vue
+ *     (se renderizan dentro del <router-view> de este layout)
+ */
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../store/authStore';
 
 const router = useRouter();
 const authStore = useAuthStore();
 
+/**
+ * Cierra la sesión del usuario tras pedir confirmación.
+ *
+ * Se pide confirmación antes de ejecutar el logout para evitar cierres
+ * accidentales de sesión — el usuario podría haber hecho clic sin querer.
+ * Si confirma, llama a authStore.logout() (que limpia el estado y las cookies)
+ * y redirige al login.
+ */
 async function handleLogout() {
   if (!confirm('¿Seguro que quieres cerrar sesión?')) return;
   await authStore.logout();
@@ -15,6 +42,10 @@ async function handleLogout() {
 <template>
   <div class="layout-container">
     <header class="navbar">
+      <!--
+        El logo es un RouterLink a '/' para que el usuario pueda volver al inicio
+        desde cualquier página con un solo clic.
+      -->
       <RouterLink to="/" class="logo">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -27,8 +58,20 @@ async function handleLogout() {
       <nav class="nav-links">
         <RouterLink to="/">Inicio</RouterLink>
         <RouterLink to="/eventos">Eventos</RouterLink>
+
+        <!--
+          Calendario y Perfil solo se muestran si el usuario está autenticado.
+          No tiene sentido mostrar estos links a usuarios no logueados porque:
+            1. El router guard redirigiría a /login de todas formas.
+            2. Ver el link sin poder acceder genera confusión en la UX.
+        -->
         <RouterLink v-if="authStore.isAuthenticated" to="/calendario">Calendario</RouterLink>
         <RouterLink v-if="authStore.isAuthenticated" to="/perfil">Perfil</RouterLink>
+
+        <!--
+          El botón de Cerrar Sesión solo existe si hay una sesión activa.
+          Sin v-if, aparecería en la landing page para usuarios no logueados.
+        -->
         <button
           v-if="authStore.isAuthenticated"
           class="logout-btn"
@@ -39,6 +82,7 @@ async function handleLogout() {
       </nav>
     </header>
 
+    <!-- Las vistas hijas definidas en el router se renderizan aquí -->
     <main class="main-content">
       <router-view />
     </main>

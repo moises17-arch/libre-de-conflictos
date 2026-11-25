@@ -3,6 +3,12 @@
     <div class="filter-row">
       <div class="filter-search">
         <span class="filter-icon">🔍</span>
+        <!--
+          v-model apunta directamente a eventStore.searchQuery.
+          Cada vez que el usuario escribe, el store se actualiza y el computed
+          filteredEvents se recalcula automáticamente porque depende de searchQuery.
+          No se necesitan emits ni props intermedios.
+        -->
         <input
           v-model="eventStore.searchQuery"
           type="text"
@@ -15,6 +21,7 @@
       <div class="filter-dates">
         <div class="date-group">
           <label class="date-label">Desde</label>
+          <!-- v-model directo al store: misma razón que searchQuery -->
           <input
             v-model="eventStore.filterDateFrom"
             type="date"
@@ -38,6 +45,10 @@
       </button>
     </div>
 
+    <!--
+      Contador de resultados: muestra cuántos eventos pasan los filtros vs el total.
+      filteredEvents.length puede ser menor que events.length cuando hay filtros activos.
+    -->
     <p class="filter-count">
       Mostrando <strong>{{eventStore.filteredEvents.length}}</strong> de
       <strong>{{eventStore.events.length}}</strong> eventos
@@ -46,10 +57,33 @@
 </template>
 
 <script setup lang="ts">
+/*
+ * components/EventFilter.vue — Controles de filtrado de eventos
+ *
+ * Proporciona tres controles de filtrado que se conectan DIRECTAMENTE con las
+ * propiedades reactivas del eventStore mediante v-model:
+ *   - Búsqueda de texto: filtra por título y descripción
+ *   - Fecha desde:       muestra solo eventos que empiezan desde esa fecha
+ *   - Fecha hasta:       muestra solo eventos que empiezan hasta esa fecha
+ *
+ * Por qué v-model directo al store (en vez de emits locales):
+ *   El store es la única fuente de verdad para los filtros. Usando v-model al store,
+ *   otros componentes (ej. CalendarioView en el futuro) pueden leer el estado
+ *   de los filtros sin necesidad de prop drilling o event buses.
+ *   El computed filteredEvents del store se recalcula automáticamente al cambiar.
+ *
+ * Conexiones:
+ *   → store/eventStore.ts    (lee y escribe searchQuery, filterDateFrom, filterDateTo)
+ *   → views/EventosView.vue  (usa este componente en la columna de lista de eventos)
+ */
 import { useEventStore } from '../store/eventStore';
 
 const eventStore = useEventStore();
 
+/**
+ * Resetea los tres campos de filtrado a cadena vacía.
+ * Al vaciarse, el computed filteredEvents del store devuelve el array completo.
+ */
 function clearFilters() {
   eventStore.searchQuery = '';
   eventStore.filterDateFrom = '';

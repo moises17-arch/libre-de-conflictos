@@ -1,4 +1,28 @@
 <script setup lang="ts">
+/*
+ * views/RegisterView.vue — Vista de registro de cuenta nueva
+ *
+ * Maneja el flujo de creación de cuenta:
+ *   1. Valida localmente que las contraseñas coincidan antes de llamar al backend
+ *      (evita una petición innecesaria si el usuario cometió un error obvio).
+ *   2. Llama a authStore.register() que hace POST /auth/register.
+ *   3. Si tiene éxito, el store guarda el token y redirige a /eventos.
+ *   4. Si falla, distingue entre errores de validación Zod (array) y errores genéricos.
+ *
+ * Manejo especial de errores Zod:
+ *   El backend usa Zod para validar el body. Cuando falla la validación,
+ *   devuelve { errors: [{ message: "..." }, ...] } (array de objetos).
+ *   Esta vista extrae todos los mensajes y los une con coma para mostrarlos
+ *   en un solo bloque de error inline.
+ *
+ * Nota: Los errores se muestran INLINE (no como toast) por las mismas razones
+ * que en LoginView: esta vista gestiona su propio feedback de autenticación.
+ *
+ * Conexiones:
+ *   → store/authStore.ts  (acción register)
+ *   → router/index.ts     (redirige a /eventos tras registro exitoso)
+ *   → services/api.ts     (interceptor omite toast de error para rutas /auth/)
+ */
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../store/authStore';
@@ -10,12 +34,28 @@ const name = ref('');
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
+// Mensaje de error inline; vacío si no hay error activo
 const errorMessage = ref('');
+// Deshabilita el botón mientras la petición está en vuelo
 const loading = ref(false);
 
+/**
+ * Maneja el envío del formulario de registro.
+ *
+ * Flujo:
+ *   1. Validación local: si las contraseñas no coinciden, muestra error y aborta.
+ *   2. Llama a authStore.register(). Si tiene éxito → redirige a /eventos.
+ *   3. En caso de error:
+ *      a. Si data.errors es un array → son errores de validación Zod.
+ *         Se extraen los mensajes con .map(e => e.message).join(', ')
+ *         para mostrarlos todos en una línea.
+ *      b. Si no → es un error genérico (ej. email ya registrado) y se muestra
+ *         data.error o data.message directamente.
+ */
 async function handleRegister() {
   errorMessage.value = '';
 
+  // Validación local antes de hacer la petición al backend
   if (password.value !== confirmPassword.value) {
     errorMessage.value = 'Las contraseñas no coinciden.';
     return;
@@ -28,9 +68,11 @@ async function handleRegister() {
   } catch (err: any) {
     const data = err.response?.data;
     if (data?.errors && Array.isArray(data.errors)) {
-      // Errores de validación Zod: array de { message }
+      // Errores de validación Zod: el backend devuelve { errors: [{ message }] }
+      // .map(e => e.message) extrae solo el texto, .join(', ') los une en una sola cadena
       errorMessage.value = data.errors.map((e: any) => e.message).join(', ');
     } else {
+      // Error genérico del servidor (ej. email duplicado, error inesperado)
       errorMessage.value =
         data?.error ||
         data?.message ||
@@ -109,6 +151,7 @@ async function handleRegister() {
           />
         </div>
 
+        <!-- Error inline: errores de validación local o del backend, no como toast -->
         <div v-if="errorMessage" class="feedback-error" role="alert">
           <span>❌</span>
           <span>{{ errorMessage }}</span>

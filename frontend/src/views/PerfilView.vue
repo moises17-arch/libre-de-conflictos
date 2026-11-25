@@ -1,4 +1,22 @@
 <script setup lang="ts">
+/*
+ * views/PerfilView.vue — Vista de perfil de usuario
+ *
+ * Permite al usuario ver su información actual y editarla:
+ *   - Nombre y email (pre-rellenos con los datos del store al montar la vista)
+ *   - Contraseña (opcional: si se deja en blanco no se modifica)
+ *
+ * Flujo de edición:
+ *   1. onMounted() carga el nombre y email actuales desde authStore.user.
+ *   2. El usuario edita los campos y hace clic en "Guardar cambios".
+ *   3. handleSubmit() valida la contraseña (mínimo 6 chars, coincidencia).
+ *   4. Llama a authStore.updateProfile() que hace PUT /users/profile.
+ *   5. Si tiene éxito, limpia los campos de contraseña y muestra toast.
+ *
+ * Conexiones:
+ *   → store/authStore.ts   (lee user, llama a updateProfile)
+ *   → store/toastStore.ts  (muestra notificaciones de éxito/error)
+ */
 import { ref, onMounted } from 'vue';
 import { useAuthStore } from '../store/authStore';
 import { useToastStore } from '../store/toastStore';
@@ -14,6 +32,12 @@ const feedbackMessage = ref('');
 const isError = ref(false);
 const passwordError = ref('');
 
+/*
+ * Pre-rellena el formulario con los datos actuales del usuario.
+ * Se usa onMounted() y no valores por defecto en ref() para garantizar
+ * que el store ya esté hidratado cuando se leen los datos
+ * (initAuth() en el router guard se ejecuta antes de que el componente monte).
+ */
 onMounted(() => {
   if (authStore.user) {
     name.value = authStore.user.name;
@@ -21,6 +45,19 @@ onMounted(() => {
   }
 });
 
+/**
+ * Envía el formulario de actualización de perfil.
+ *
+ * Validaciones locales antes de llamar al backend:
+ *   - Si se escribió una contraseña nueva, debe tener al menos 6 caracteres.
+ *   - newPassword y confirmPassword deben coincidir.
+ *
+ * Si la actualización tiene éxito:
+ *   - Se limpian los campos de contraseña por seguridad (no dejar texto plano en el DOM).
+ *   - Se muestra un toast de éxito.
+ *
+ * Si falla: se muestra un toast de error y el mensaje inline.
+ */
 async function handleSubmit() {
   feedbackMessage.value = '';
   passwordError.value = '';
@@ -39,6 +76,7 @@ async function handleSubmit() {
   const result = await authStore.updateProfile({
     name: name.value,
     email: email.value,
+    // Si no se escribió contraseña, se envía undefined para que el backend no la modifique
     password: newPassword.value || undefined,
   });
 
@@ -47,6 +85,7 @@ async function handleSubmit() {
 
   if (result.success) {
     toastStore.toastSuccess(result.message);
+    // Limpiar campos de contraseña tras actualización exitosa por seguridad
     newPassword.value = '';
     confirmPassword.value = '';
   } else {
@@ -54,6 +93,13 @@ async function handleSubmit() {
   }
 }
 
+/**
+ * Formatea una fecha ISO a formato legible en español largo (ej. "12 de enero de 2025").
+ * Se usa para mostrar la fecha de creación de cuenta ("Miembro desde").
+ *
+ * @param dateStr - Fecha en formato ISO 8601 o undefined si el dato no está disponible
+ * @returns       - Fecha formateada en español o '—' si dateStr es falsy
+ */
 function formatDate(dateStr: string | undefined) {
   if (!dateStr) return '—';
   return new Date(dateStr).toLocaleDateString('es', { dateStyle: 'long' });
@@ -68,11 +114,18 @@ function formatDate(dateStr: string | undefined) {
     </div>
 
     <div class="perfil-grid">
-      <!-- Edit form -->
+      <!-- Formulario de edición -->
       <div class="perfil-card">
-        <!-- Avatar section -->
+        <!-- Avatar con iniciales del nombre -->
         <div class="avatar-section">
           <div class="avatar">
+            <!--
+              Genera las iniciales del avatar a partir del nombre:
+                .split(' ')          → divide el nombre en palabras ['Juan', 'Pérez']
+                .map(n => n[0])      → toma la primera letra de cada palabra ['J', 'P']
+                .slice(0, 2)         → limita a 2 iniciales para nombres largos
+                .join('').toUpperCase() → une y convierte a mayúsculas → 'JP'
+            -->
             {{ authStore.user?.name?.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase() || '?' }}
           </div>
           <p class="avatar-name">{{ authStore.user?.name || '—' }}</p>
@@ -126,6 +179,7 @@ function formatDate(dateStr: string | undefined) {
             />
           </div>
 
+          <!-- Error de validación de contraseña (local, antes de llamar al backend) -->
           <div v-if="passwordError" class="feedback-message feedback-error">
             <span>❌</span>
             <span>{{ passwordError }}</span>
@@ -133,6 +187,7 @@ function formatDate(dateStr: string | undefined) {
 
           <button type="submit" class="submit-btn">Guardar cambios</button>
 
+          <!-- Respuesta del backend: éxito o error -->
           <div
             v-if="feedbackMessage"
             class="feedback-message"
@@ -144,7 +199,7 @@ function formatDate(dateStr: string | undefined) {
         </form>
       </div>
 
-      <!-- Info card -->
+      <!-- Tarjeta de información de cuenta (solo lectura) -->
       <div class="info-card">
         <h2 class="card-title">Información de cuenta</h2>
         <div class="info-row">
@@ -157,6 +212,7 @@ function formatDate(dateStr: string | undefined) {
         </div>
         <div class="info-row">
           <span class="info-label">Miembro desde</span>
+          <!-- formatDate convierte la fecha ISO a formato legible en español -->
           <span class="info-value">{{ formatDate(authStore.user?.created_at) }}</span>
         </div>
       </div>

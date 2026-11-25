@@ -1,4 +1,24 @@
 <script setup lang="ts">
+/*
+ * views/CalendarioView.vue — Vista de calendario mensual con FullCalendar
+ *
+ * Muestra todos los eventos del usuario en una cuadrícula de calendario mensual.
+ * El usuario puede:
+ *   - Ver eventos en su día correspondiente.
+ *   - Hacer clic en un evento para ver su detalle en un panel lateral derecho.
+ *   - Hacer clic en un día vacío para abrir un formulario de creación pre-rellenado
+ *     con la fecha clicada en el mismo panel lateral.
+ *
+ * Dependencias externas:
+ *   - @fullcalendar/vue3:          componente Vue de FullCalendar
+ *   - @fullcalendar/daygrid:       plugin para la vista de mes (cuadrícula de días)
+ *   - @fullcalendar/interaction:   plugin que habilita eventClick y dateClick
+ *
+ * Conexiones:
+ *   → store/eventStore.ts       (lee events, llama a createEvent)
+ *   → store/authStore.ts        (lee user.id para cargar eventos)
+ *   → components/SkeletonCard.vue (placeholder mientras carga)
+ */
 import { ref, computed, onMounted } from 'vue';
 import FullCalendar from '@fullcalendar/vue3';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -11,67 +31,116 @@ import SkeletonCard from '../components/SkeletonCard.vue';
 const eventStore = useEventStore();
 const authStore = useAuthStore();
 
+// Evento seleccionado al hacer clic en el calendario; null si ninguno está seleccionado
 const selectedEvent = ref<EventModel | null>(null);
+
+// Controla la visibilidad del panel lateral de detalle de evento
 const showPanel = ref(false);
 
-// Pre-fill form when clicking a date
+// Fecha del día clicado (formato YYYY-MM-DD), usado como título del formulario de nuevo evento
 const newEventDate = ref('');
+// Controla la visibilidad del formulario de creación en el panel lateral
 const showNewForm = ref(false);
 const newTitle = ref('');
 const newDescription = ref('');
 const newStartTime = ref('');
 const newEndTime = ref('');
 const newTimezone = ref('America/Bogota');
+// Feedback del formulario de creación dentro del panel lateral
 const createFeedback = ref('');
 const createIsError = ref(false);
 
+/*
+ * calendarEvents — Transforma los eventos del store al formato que espera FullCalendar.
+ *
+ * El store guarda eventos como EventModel (con startTime, endTime, etc.).
+ * FullCalendar espera objetos con la forma: { id, title, start, end, extendedProps }.
+ * extendedProps permite guardar el objeto EventModel completo para recuperarlo
+ * en el handler eventClick (info.event.extendedProps.event).
+ */
 const calendarEvents = computed(() =>
   eventStore.events.map(ev => ({
     id: String(ev.id),
     title: ev.title,
+    // Compatibilidad entre camelCase (frontend) y snake_case (backend)
     start: ev.startTime || (ev as any).start_time,
     end: ev.endTime || (ev as any).end_time,
-    extendedProps: { event: ev },
+    extendedProps: { event: ev }, // Guardamos el objeto completo para accederlo en eventClick
   }))
 );
 
+/*
+ * calendarOptions — Objeto de configuración completo de FullCalendar.
+ *
+ * Es un computed para que se recalcule cuando cambia calendarEvents
+ * y el calendario se actualice reactivamente al crear/editar/eliminar eventos.
+ *
+ * Plugins:
+ *   - dayGridPlugin:     habilita la vista 'dayGridMonth' (cuadrícula de mes)
+ *   - interactionPlugin: habilita eventClick y dateClick (sin él, los clics no funcionan)
+ *
+ * Locale: 'es' muestra los nombres de días y meses en español.
+ *
+ * Handlers:
+ *   - eventClick: se dispara al hacer clic en un evento del calendario.
+ *                 Extrae el EventModel de extendedProps y lo muestra en el panel lateral.
+ *   - dateClick:  se dispara al hacer clic en un día vacío del calendario.
+ *                 Pre-rellena el formulario con la fecha clicada (hora de inicio 09:00, fin 10:00)
+ *                 y muestra el panel de creación.
+ */
 const calendarOptions = computed(() => ({
   plugins: [dayGridPlugin, interactionPlugin],
-  locale: 'es',
-  initialView: 'dayGridMonth',
+  locale: 'es',              // Interfaz del calendario en español
+  initialView: 'dayGridMonth', // Vista inicial: cuadrícula mensual
   headerToolbar: {
     left: 'prev,next today',
     center: 'title',
     right: '',
   },
   events: calendarEvents.value,
+
+  // Muestra el detalle del evento clicado en el panel lateral derecho
   eventClick: (info: any) => {
     selectedEvent.value = info.event.extendedProps.event as EventModel;
     showPanel.value = true;
-    showNewForm.value = false;
+    showNewForm.value = false; // Cierra el formulario de nuevo evento si estaba abierto
   },
+
+  // Abre el formulario de nuevo evento pre-rellenado con la fecha del día clicado
   dateClick: (info: any) => {
     newEventDate.value = info.dateStr;
+    // Pre-rellena con horario por defecto (09:00 - 10:00) como punto de partida
     newStartTime.value = `${info.dateStr}T09:00`;
     newEndTime.value = `${info.dateStr}T10:00`;
     newTitle.value = '';
     newDescription.value = '';
     createFeedback.value = '';
     showNewForm.value = true;
-    showPanel.value = false;
+    showPanel.value = false;    // Cierra el panel de detalle si estaba abierto
     selectedEvent.value = null;
   },
 }));
 
+/** Cierra el panel lateral de detalle de evento. */
 function closePanel() {
   showPanel.value = false;
   selectedEvent.value = null;
 }
 
+/** Cierra el panel lateral del formulario de nuevo evento. */
 function closeNewForm() {
   showNewForm.value = false;
 }
 
+/**
+ * Envía el formulario de creación de evento desde el calendario.
+ *
+ * Flujo:
+ *   1. Llama a eventStore.createEvent() con los datos del formulario lateral.
+ *   2. Muestra feedback dentro del panel (éxito o error).
+ *   3. Si tuvo éxito, cierra el panel lateral (el nuevo evento aparecerá en el calendario
+ *      automáticamente porque calendarEvents es un computed que depende de eventStore.events).
+ */
 async function handleCreateEvent() {
   createFeedback.value = '';
   const result = await eventStore.createEvent({
@@ -84,15 +153,26 @@ async function handleCreateEvent() {
   createIsError.value = !result.success;
   createFeedback.value = result.message;
   if (result.success) {
+    // El evento ya fue agregado al store por createEvent(); el computed lo refleja automáticamente
     showNewForm.value = false;
   }
 }
 
+/**
+ * Formatea una fecha ISO a formato legible corto en español.
+ * @param iso - Fecha ISO 8601 (puede ser undefined)
+ * @returns   - Cadena formateada o '—' si iso es falsy
+ */
 function formatDate(iso: string | undefined) {
   if (!iso) return '—';
   return new Date(iso).toLocaleString('es', { dateStyle: 'medium', timeStyle: 'short' });
 }
 
+/*
+ * onMounted: rehidrata el store y carga los eventos del usuario.
+ * initAuth() se llama aquí como medida de seguridad para el caso en que
+ * el usuario navegue directamente a /calendario tras una recarga.
+ */
 onMounted(() => {
   authStore.initAuth();
   if (authStore.user) {
@@ -109,17 +189,19 @@ onMounted(() => {
     </div>
 
     <div class="calendario-layout">
-      <!-- Calendar -->
+      <!-- Componente principal del calendario -->
       <div class="calendar-card">
+        <!-- Skeleton mientras los eventos se están cargando desde el backend -->
         <template v-if="eventStore.loading">
           <SkeletonCard :lines="5" :showTitle="true" />
         </template>
         <template v-else>
+          <!-- FullCalendar recibe toda su configuración en un solo objeto options -->
           <FullCalendar :options="calendarOptions" />
         </template>
       </div>
 
-      <!-- Event detail panel -->
+      <!-- Panel lateral de detalle: aparece al hacer clic en un evento del calendario -->
       <div v-if="showPanel && selectedEvent" class="side-panel">
         <div class="panel-header">
           <h3 class="panel-title">Detalle del evento</h3>
@@ -141,9 +223,10 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- New event form triggered by dateClick -->
+      <!-- Panel lateral de creación: aparece al hacer clic en un día vacío del calendario -->
       <div v-if="showNewForm" class="side-panel">
         <div class="panel-header">
+          <!-- El título muestra la fecha del día clicado para contexto -->
           <h3 class="panel-title">Nuevo Evento — {{ newEventDate }}</h3>
           <button class="close-btn" @click="closeNewForm">✕</button>
         </div>
@@ -159,6 +242,7 @@ onMounted(() => {
             </div>
             <div class="form-group">
               <label>Inicio</label>
+              <!-- Pre-rellenado por dateClick con la hora por defecto 09:00 -->
               <input v-model="newStartTime" type="datetime-local" required />
             </div>
             <div class="form-group">
@@ -166,6 +250,7 @@ onMounted(() => {
               <input v-model="newEndTime" type="datetime-local" required />
             </div>
             <button type="submit" class="submit-btn">Guardar Evento</button>
+            <!-- Feedback de creación dentro del panel lateral -->
             <div
               v-if="createFeedback"
               class="feedback-message"
@@ -373,7 +458,7 @@ onMounted(() => {
 </style>
 
 <style>
-/* Global FullCalendar overrides — not scoped */
+/* Sobrescrituras globales de FullCalendar — no scoped para que afecten al DOM del plugin */
 .fc-button-primary {
   background-color: #374151 !important;
   border-color: #374151 !important;

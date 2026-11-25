@@ -1,12 +1,16 @@
 <template>
   <div>
-    <!-- Dashboard (authenticated) -->
+    <!--
+      MODO DASHBOARD (usuario autenticado):
+      Muestra el saludo personalizado, estadísticas de eventos y los próximos 5 eventos.
+      Se activa cuando authStore.isAuthenticated es true.
+    -->
     <template v-if="authStore.isAuthenticated">
       <section class="dashboard">
         <h1 class="greeting">Hola, {{ authStore.user?.name }} 👋</h1>
         <p class="greeting-sub">{{ todayStr }}</p>
 
-        <!-- Stats row -->
+        <!-- Tarjetas de estadísticas: muestra skeletons mientras carga -->
         <div class="stats-grid">
           <template v-if="eventStore.loading">
             <SkeletonCard v-for="n in 3" :key="n" :lines="1" :showTitle="true" />
@@ -46,7 +50,7 @@
           </template>
         </div>
 
-        <!-- Upcoming events list -->
+        <!-- Lista de próximos eventos (máximo 5) -->
         <section class="upcoming-section">
           <h2 class="section-title">Próximos eventos</h2>
           <div v-if="upcomingEvents.length === 0" class="empty-state">
@@ -62,7 +66,7 @@
           </ul>
         </section>
 
-        <!-- Navigation buttons -->
+        <!-- Botones de navegación rápida al resto de la app -->
         <div class="nav-buttons">
           <RouterLink to="/eventos" class="nav-btn primary">Ver todos los eventos →</RouterLink>
           <RouterLink to="/calendario" class="nav-btn secondary">Ver calendario →</RouterLink>
@@ -70,9 +74,13 @@
       </section>
     </template>
 
-    <!-- Landing page (not authenticated) -->
+    <!--
+      MODO LANDING PAGE (usuario no autenticado):
+      Muestra la página de marketing con hero y sección de características.
+      Se activa cuando el usuario no ha iniciado sesión.
+    -->
     <template v-else>
-      <!-- Hero Section -->
+      <!-- Sección hero con llamada a la acción -->
       <section class="hero">
         <span class="badge">Sistema Inteligente de Calendarios</span>
         <h1 class="hero-title">Gestiona tu agenda sin conflictos</h1>
@@ -83,7 +91,7 @@
         <RouterLink to="/eventos" class="cta-button">Comenzar Ahora →</RouterLink>
       </section>
 
-      <!-- Features Section -->
+      <!-- Sección de características del producto -->
       <section class="features">
         <h2 class="features-title">¿Por qué Libre de Conflictos?</h2>
         <div class="features-grid">
@@ -134,6 +142,24 @@
 </template>
 
 <script setup lang="ts">
+/*
+ * views/HomeView.vue — Vista de inicio (doble modo: dashboard y landing)
+ *
+ * Esta vista tiene dos comportamientos según el estado de autenticación:
+ *
+ *   AUTENTICADO → Dashboard:
+ *     Muestra saludo personalizado, tarjetas de estadísticas (total/próximos/activos)
+ *     y la lista de los próximos 5 eventos ordenados por fecha.
+ *
+ *   NO AUTENTICADO → Landing page:
+ *     Muestra la sección hero con llamada a la acción y las tarjetas de características
+ *     del producto para convencer al usuario de registrarse.
+ *
+ * Conexiones:
+ *   → store/authStore.ts   (lee isAuthenticated y user)
+ *   → store/eventStore.ts  (carga events y stats para el dashboard)
+ *   → components/SkeletonCard.vue (placeholder de carga)
+ */
 import { computed, onMounted } from 'vue';
 import { useAuthStore } from '../store/authStore';
 import { useEventStore } from '../store/eventStore';
@@ -142,16 +168,37 @@ import SkeletonCard from '../components/SkeletonCard.vue';
 const authStore = useAuthStore();
 const eventStore = useEventStore();
 
+/*
+ * todayStr — Fecha actual formateada en español largo.
+ * Ejemplo: "miércoles, 15 de enero de 2025"
+ * Se usa en el saludo del dashboard. text-transform: capitalize en CSS
+ * convierte la primera letra a mayúscula.
+ */
 const todayStr = computed(() => new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
 
+/*
+ * upcomingEvents — Lista de los próximos 5 eventos del usuario.
+ *
+ * Pasos:
+ *   1. filter: descarta eventos pasados (startTime <= ahora)
+ *   2. sort:   ordena de más próximo a más lejano (ascendente)
+ *   3. slice:  toma solo los primeros 5 para no saturar el dashboard
+ */
 const upcomingEvents = computed(() => {
   const now = new Date();
   return eventStore.events
-    .filter(e => new Date(e.startTime) > now)
-    .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
-    .slice(0, 5);
+    .filter(e => new Date(e.startTime) > now)      // Solo eventos futuros
+    .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()) // Más próximo primero
+    .slice(0, 5); // Máximo 5 en el dashboard
 });
 
+/**
+ * Formatea una fecha ISO a formato legible corto en español.
+ * Ejemplo: "mié. 15 ene., 09:00"
+ *
+ * @param isoString - Fecha en formato ISO 8601
+ * @returns         - Cadena formateada en español
+ */
 function formatDate(isoString: string): string {
   return new Date(isoString).toLocaleString('es-ES', {
     weekday: 'short',
@@ -162,9 +209,24 @@ function formatDate(isoString: string): string {
   });
 }
 
+/*
+ * onMounted: carga inicial de datos para el dashboard.
+ *
+ * Por qué se llama initAuth() aquí:
+ *   HomeView puede ser la primera pantalla tras una recarga directa en '/'.
+ *   El router guard ya la llama, pero como esta vista puede cargarse sin navegar
+ *   (p.ej. primer acceso), la llamamos de nuevo para garantizar que el store
+ *   esté hidratado antes de verificar isAuthenticated.
+ *
+ * Por qué Promise.all():
+ *   fetchEvents y fetchStats son independientes entre sí. Lanzarlos en paralelo
+ *   reduce el tiempo de carga del dashboard a max(t_eventos, t_stats) en lugar
+ *   de t_eventos + t_stats (suma secuencial).
+ */
 onMounted(async () => {
   authStore.initAuth();
   if (authStore.isAuthenticated && authStore.user) {
+    // Cargar eventos y estadísticas en paralelo para reducir el tiempo de espera
     await Promise.all([
       eventStore.fetchEvents(authStore.user.id!),
       eventStore.fetchStats()

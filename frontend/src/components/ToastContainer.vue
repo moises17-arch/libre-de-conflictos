@@ -1,6 +1,21 @@
 <template>
+  <!--
+    <teleport to="body"> renderiza este componente como hijo directo del <body>
+    del HTML, fuera del árbol Vue normal. Esto evita dos problemas comunes:
+      1. Problemas de z-index: un contenedor padre con overflow:hidden o
+         z-index bajo podría recortar los toasts.
+      2. Herencia de estilos: al estar en el body, los toasts no heredan
+         estilos no deseados del layout padre.
+  -->
   <teleport to="body">
     <div class="toast-container" aria-live="polite" aria-atomic="false">
+      <!--
+        <TransitionGroup> aplica animaciones CSS coordinadas a cada toast
+        que entra o sale de la lista. Cuando un toast se agrega, entra
+        deslizándose desde la derecha (translateX(100%) → translateX(0)).
+        Cuando se elimina, sale deslizándose hacia la derecha de nuevo.
+        Los toasts restantes se reposicionan suavemente gracias a .toast-move.
+      -->
       <TransitionGroup name="toast" tag="div">
         <div
           v-for="toast in toastStore.toasts"
@@ -9,8 +24,14 @@
           :class="`toast-${toast.type}`"
           role="alert"
         >
+          <!-- Icono visual según el tipo de notificación -->
           <span class="toast-icon">{{icons[toast.type]}}</span>
           <span class="toast-message">{{toast.message}}</span>
+
+          <!--
+            Botón de cierre manual: el usuario puede descartar un toast antes
+            de que expire su tiempo automático llamando a removeToast(id).
+          -->
           <button
             class="toast-close"
             aria-label="Cerrar notificación"
@@ -23,10 +44,28 @@
 </template>
 
 <script setup lang="ts">
+/*
+ * components/ToastContainer.vue — Contenedor global de notificaciones toast
+ *
+ * Renderiza la lista de toasts del toastStore como notificaciones flotantes
+ * en la esquina inferior derecha de la pantalla. Se monta una sola vez en
+ * App.vue para que esté disponible en todas las rutas.
+ *
+ * El componente usa <teleport to="body"> para evitar problemas de z-index
+ * y overflow que ocurrirían si estuviera anidado dentro del layout normal.
+ *
+ * Conexiones:
+ *   → store/toastStore.ts  (lee toasts y llama a removeToast)
+ *   → App.vue              (aquí se monta este componente)
+ */
 import { useToastStore } from '../store/toastStore';
 
 const toastStore = useToastStore();
 
+/*
+ * Mapeo de tipo de toast a emoji representativo.
+ * Se usa en el template como icons[toast.type] para seleccionar el icono correcto.
+ */
 const icons: Record<string, string> = {
   success: '✅',
   error: '❌',
@@ -111,7 +150,14 @@ const icons: Record<string, string> = {
   opacity: 1;
 }
 
-/* TransitionGroup animations */
+/*
+ * Animaciones de TransitionGroup:
+ *
+ * .toast-enter-from: estado inicial cuando el toast aparece (invisible, desplazado a la derecha)
+ * .toast-leave-to:   estado final cuando el toast desaparece (mismo efecto que la entrada)
+ * .toast-enter-active / .toast-leave-active: duración y easing de la animación
+ * .toast-move: anima el reposicionamiento de los toasts restantes cuando uno desaparece
+ */
 .toast-enter-active {
   transition: all 0.3s ease-out;
 }
@@ -120,6 +166,7 @@ const icons: Record<string, string> = {
   transition: all 0.25s ease-in;
 }
 
+/* Estado inicial de entrada y final de salida: fuera de pantalla a la derecha */
 .toast-enter-from {
   opacity: 0;
   transform: translateX(100%);
